@@ -1,3 +1,7 @@
+#include <dummy.h>
+
+#include <dummy.h>
+
 /*
  * E-ink метеостанция — ГЛАВНЫЙ модуль (ESP32-C6)
  * Zigbee-координатор + E-ink 7.5" + SHT45 + BME280 + SCD40 (CO2) + GPS Ublox NEO-6M
@@ -8,7 +12,7 @@
  *   - Температура в °C, давление в мм рт. ст.
  *   - График за 24 часа: наружная температура — линия, влажность дома — столбики,
  *     давление — пунктир. История (шаг 15 мин) хранится во флеше и переживает перезагрузки.
- *   - Прогноз на 5 дней (Open-Meteo) + город/район (OpenStreetMap Nominatim).
+ *   - Прогноз на 5 дней (MET Norway, без ключа) + город/район (OpenStreetMap Nominatim).
  *     Wi-Fi и Zigbee вместе не работают, поэтому раз в 3 часа плата перезагружается
  *     в короткий режим синхронизации (~15-30 с), скачивает данные, сохраняет их
  *     и возвращается в обычный режим. Пока прогноза нет — график крупнее,
@@ -48,6 +52,7 @@
 
 #include <Arduino.h>
 #include <ctype.h>
+#include <stdarg.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <Preferences.h>
@@ -58,8 +63,15 @@
 #include <ArduinoJson.h>
 #include <GxEPD2_BW.h>
 #include <Fonts/FreeMonoBold24pt7b.h>
+#include <Fonts/FreeMonoBold18pt7b.h>
 #include <Fonts/FreeMonoBold12pt7b.h>
 #include <Fonts/FreeMono9pt7b.h>
+#include <Fonts/FreeSans9pt7b.h>
+#include <Fonts/FreeSans12pt7b.h>
+#include <Fonts/FreeSans18pt7b.h>
+#include <Fonts/FreeSansBold12pt7b.h>
+#include <Fonts/FreeSansBold18pt7b.h>
+#include <Fonts/FreeSansBold24pt7b.h>
 #include <Adafruit_SHT4x.h>
 #include <Adafruit_BME280.h>
 #include <SensirionI2cScd4x.h>
@@ -90,12 +102,13 @@
 
 #define SYNC_PERIOD_MS (3UL * 60UL * 60UL * 1000UL)  // прогноз раз в 3 часа
 #define FIRST_SYNC_MS  (120UL * 1000UL)              // первая попытка через 2 мин после старта
+#define RETRY_MS       (120UL * 1000UL)              // после неудачной синхронизации повтор через 2 мин после старта
 #define FC_MIN_DAYS    3                             // меньше дней в прогнозе — считаем "нет интернета"
 
 #define HN         96                  // точек истории: 96 * 15 мин = 24 ч
 #define HSLOT_SEC  900UL
 #define HMAGIC     0xE1C2
-#define FCMAGIC    0xFC01
+#define FCMAGIC    0xFC02
 
 // Причины ошибки Wi-Fi (код сохраняется во флеш и расшифровывается внизу экрана)
 #define WE_OK        0
@@ -109,6 +122,7 @@
 
 // ===================== ТИПЫ (все до первой функции — требование Arduino-препроцессора) =====================
 enum Trend { TREND_UNKNOWN, TREND_IMPROVING, TREND_STABLE, TREND_WORSENING };
+enum IconKind { K_SUN, K_PART, K_CLOUD, K_RAIN, K_SNOW, K_STORM, K_FOG, K_UNKNOWN };
 
 struct LT {                            // локальное время
   bool haveDate;
@@ -133,6 +147,39 @@ struct Forecast {                      // прогноз и место
   int8_t   tmin[5];
   char     city[28];
   char     dist[28];
+  char     region[28];                 // область/регион (показываем, если города нет)
+  uint32_t hourEpoch;                  // UTC время первой почасовой точки
+  uint8_t  nHour;                      // сколько почасовых точек сохранено (0..6)
+  int16_t  hourT[6];                   // температура, десятые доли °C
+  uint8_t  hourH[6];                   // влажность, % (255 = нет)
+};
+
+// Поток для ArduinoJson поверх TLS-клиента: терпеливо ждёт следующие байты (до tmo мс) и
+// считает прочитанное. Без этого пауза в приходе данных превращалась в "IncompleteInput".
+class WaitStream : public Stream {
+ public:
+  Client  &c;
+  uint32_t tmo;
+  uint32_t count = 0;
+  WaitStream(Client &cl, uint32_t t) : c(cl), tmo(t) {}
+  int available() override { return c.available(); }
+  int peek() override { return c.peek(); }
+  size_t write(uint8_t) override { return 0; }
+  int read() override {
+    uint32_t t0 = millis();
+    while (!c.available()) {
+      if (!c.connected()) return -1;            // сервер закрыл соединение, данных больше нет
+      if (millis() - t0 > tmo) return -1;       // долго ничего не приходит
+      delay(1);
+    }
+    count++;
+    return c.read();
+  }
+  size_t readBytes(char *b, size_t n) override {
+    size_t i = 0;
+    while (i < n) { int ch = read(); if (ch < 0) break; b[i++] = (char)ch; }
+    return i;
+  }
 };
 
 // ===================== ЭКРАН =====================
@@ -160,6 +207,15 @@ bool     syncFailFlag = false;
 uint8_t  wifiErr = WE_UNKNOWN;          // результат последней попытки Wi-Fi
 volatile uint8_t lastDiscReason = 0;    // причина последнего разрыва Wi-Fi (из события)
 
+char errDetail[80] = "";                // подробность последней ошибки синхронизации (показывается на экране)
+void setErrDetail(const char *fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+  vsnprintf(errDetail, sizeof(errDetail), fmt, ap);
+  va_end(ap);
+  Serial.printf("ERR: %s\n", errDetail);
+}
+
 // ===================== НАСТРОЙКИ =====================
 struct Settings {
   String   ssid;
@@ -171,7 +227,6 @@ struct Settings {
   uint16_t zbIntervalSec   = 60;    // как часто опрашиваем наружный модуль, с
   int8_t   tz              = 0;     // часовой пояс (UTC+N)
   uint16_t clockSetMin     = 480;   // запасное время (если нет GPS и NTP), мин. с полуночи
-  String   geoKey;                  // API-ключ Dadata для определения города/района (dadata.ru)
 } cfg;
 
 void loadSettings() {
@@ -184,7 +239,6 @@ void loadSettings() {
   cfg.zbIntervalSec   = prefs.getUShort("zbi", 60);
   cfg.tz              = prefs.getChar("tz", 0);
   cfg.clockSetMin     = prefs.getUShort("cmin", 480);
-  cfg.geoKey          = prefs.getString("geokey", "");
 }
 
 void saveSettings() {
@@ -197,7 +251,6 @@ void saveSettings() {
   prefs.putUShort("zbi", cfg.zbIntervalSec);
   prefs.putChar("tz", cfg.tz);
   prefs.putUShort("cmin", cfg.clockSetMin);
-  prefs.putString("geokey", cfg.geoKey);
 }
 
 // ===================== ДАННЫЕ НАРУЖНОГО МОДУЛЯ (Zigbee) =====================
@@ -415,6 +468,29 @@ void histAdd(uint32_t slot, float t, float h, float pmm) {
 
 void histSave() { prefs.putBytes("hist", &hist, sizeof(hist)); }
 
+// Температура/влажность "сейчас" из последнего прогноза (почасовые точки, линейная интерполяция).
+// Используется, когда наружный модуль недоступен. Годится ~6 часов после синхронизации.
+bool webOutdoor(float &t, float &h) {
+  t = NAN; h = NAN;
+  if (fc.magic != FCMAGIC || fc.nHour == 0) return false;
+  uint32_t e = epochNow();
+  if (!e) return false;
+  int64_t dt = (int64_t)e - (int64_t)fc.hourEpoch;
+  if (dt < -3600) return false;                          // часы ушли назад
+  if (dt < 0) dt = 0;
+  int idx = (int)(dt / 3600);
+  if (idx >= fc.nHour) return false;                     // данные устарели
+  float fr = (dt % 3600) / 3600.0f;
+  if (idx + 1 < fc.nHour) {
+    t = (fc.hourT[idx] * (1.0f - fr) + fc.hourT[idx + 1] * fr) / 10.0f;
+    if (fc.hourH[idx] != 255 && fc.hourH[idx + 1] != 255) h = fc.hourH[idx] * (1.0f - fr) + fc.hourH[idx + 1] * fr;
+  } else {
+    t = fc.hourT[idx] / 10.0f;
+    if (fc.hourH[idx] != 255) h = fc.hourH[idx];
+  }
+  return true;
+}
+
 void sampleHistory() {
   static uint32_t lastChk = 0;
   uint32_t now = millis();
@@ -429,7 +505,10 @@ void sampleHistory() {
   float inH = NAN;
   if (sht4.getEvent(&hum, &temp)) inH = hum.relative_humidity;
   float pHpa = bme.readPressure() / 100.0f;
-  histAdd(slot, zbLinkOk() ? outT : NAN, inH, isnan(pHpa) ? NAN : pHpa * 0.750062f);
+  float histOut = NAN, wt, wh;
+  if (zbLinkOk()) histOut = outT;
+  else if (webOutdoor(wt, wh)) histOut = wt;             // нет наружного модуля — пишем температуру из интернета
+  histAdd(slot, histOut, inH, isnan(pHpa) ? NAN : pHpa * 0.750062f);
   histSave();
 }
 
@@ -443,6 +522,43 @@ int textW(const char *s) {
 void printRight(int xr, int y, const char *s) {
   display.setCursor(xr - textW(s), y);
   display.print(s);
+}
+
+// Строка "полупрозрачным" шрифтом (серый шахматкой), выровнена вправо, обрезается по maxW
+void printRightGray(int xr, int y, const char *s, int maxW) {
+  char b[48];
+  strlcpy(b, s, sizeof(b));
+  int n = (int)strlen(b);
+  bool cut = false;
+  while (n > 3 && textW(b) > maxW) { b[--n] = 0; cut = true; }
+  if (cut) b[n - 1] = '.';
+  int16_t bx, by; uint16_t bw, bh;
+  display.getTextBounds(b, 0, 0, &bx, &by, &bw, &bh);
+  int x = xr - (int)bw - bx;
+  display.setCursor(x, y);
+  display.print(b);
+  int x0 = x + bx, y0 = y + by;
+  for (int yy = y0; yy < y0 + (int)bh; yy++)
+    for (int xx = x0; xx < x0 + (int)bw; xx++)
+      if (((xx + yy) & 1) == 0) display.drawPixel(xx, yy, GxEPD_WHITE);
+}
+
+// "Novosibirsk Oblast" -> "Novosibirsk obl" (работает на копии строки)
+void shortenRegion(char *s) {
+  char *p = strstr(s, "Oblast");
+  if (!p) p = strstr(s, "oblast");
+  if (p) { memcpy(p, "obl", 3); memmove(p + 3, p + 6, strlen(p + 6) + 1); }
+}
+
+// печать с выравниванием вправо; если текст шире maxW — обрезаем и ставим точку в конце
+void printRightFit(int xr, int y, const char *s, int maxW) {
+  char b[40];
+  strlcpy(b, s, sizeof(b));
+  int n = (int)strlen(b);
+  bool cut = false;
+  while (n > 3 && textW(b) > maxW) { b[--n] = 0; cut = true; }
+  if (cut) b[n - 1] = '.';
+  printRight(xr, y, b);
 }
 
 void printCenter(int xc, int y, const char *s) {
@@ -460,128 +576,389 @@ void printTempC(int x, int y, float t, int decimals, int rad, int dy) {
   display.print("C");
 }
 
-// Крупная наружная температура: целая часть х2, десятые обычным размером
-void drawBigTemp(int x, int y, float t) {
-  display.setFont(&FreeMonoBold24pt7b);
+// Печать так, чтобы ЛЕВЫЙ край самих букв ("чернил") оказался в inkLeft; вокруг белая кайма halo px,
+// чтобы текст не сливался с тем, что нарисовано под ним (иконкой). Возвращает правый край чернил.
+static int printInkHalo(int inkLeft, int y, const char *s, int halo) {
+  int16_t bx, by; uint16_t bw, bh;
+  display.getTextBounds(s, 0, 0, &bx, &by, &bw, &bh);
+  int cx = inkLeft - bx;
+  display.setTextColor(GxEPD_WHITE);
+  for (int dy = -halo; dy <= halo; dy++)
+    for (int dx = -halo; dx <= halo; dx++) {
+      if (dx == 0 && dy == 0) continue;
+      if (dx * dx + dy * dy > halo * halo + 1) continue;
+      display.setCursor(cx + dx, y + dy);
+      display.print(s);
+    }
+  display.setTextColor(GxEPD_BLACK);
+  display.setCursor(cx, y);
+  display.print(s);
+  return inkLeft + (int)bw;
+}
+
+// Крупная наружная температура справа от иконки (без наложения). Целая часть крупно (размер 2),
+// десятые мелко вплотную, потом "°C". cy — вертикальный центр цифр, inkLeft — левый край цифр.
+void drawBigTemp(int inkLeft, int cy, float t) {
+  display.setFont(&FreeSansBold24pt7b);
+  display.setTextSize(2);
+  int16_t bx, by; uint16_t bw, bh;
+  display.getTextBounds("0", 0, 0, &bx, &by, &bw, &bh);
+  int y = cy - by - (int)bh / 2;
+  int top = y + by;
   if (isnan(t)) {
-    display.setTextSize(2);
-    display.setCursor(x, y);
-    display.print("--");
+    printInkHalo(inkLeft, y, "--", 0);
     display.setTextSize(1);
     return;
   }
   int tenths = (int)lroundf(t * 10.0f);
   bool neg = tenths < 0;
   int a = abs(tenths);
-  char ip[10], fp[4];
+  char ip[8];
   snprintf(ip, sizeof(ip), "%s%d", neg ? "-" : "", a / 10);
-  snprintf(fp, sizeof(fp), ".%d", a % 10);
-  display.setTextSize(2);
-  display.setCursor(x, y);
-  display.print(ip);
-  int cx = display.getCursorX();
+  int xr = printInkHalo(inkLeft, y, ip, 0);
   display.setTextSize(1);
-  display.setCursor(cx, y);
-  display.print(fp);
-  cx = display.getCursorX();
-  display.drawCircle(cx + 9, y - 50, 6, GxEPD_BLACK);
-  display.setCursor(cx + 22, y - 28);
-  display.print("C");
+  display.setFont(&FreeSansBold18pt7b);
+  char fp[3] = { '.', (char)('0' + a % 10), 0 };
+  xr = printInkHalo(xr + 4, y, fp, 0);
+  int ccx = xr + 10, ccy = top + 8;                         // значок градуса
+  display.drawCircle(ccx, ccy, 6, GxEPD_BLACK);
+  display.drawCircle(ccx, ccy, 5, GxEPD_BLACK);
+  display.setFont(&FreeSans18pt7b);
+  printInkHalo(xr + 22, top + 32, "C", 0);
 }
 
 void cell(int x, int y, const char *label, const char *val) {
-  display.setFont(&FreeMono9pt7b);
+  display.setFont(&FreeSans9pt7b);
   display.setCursor(x, y);
   display.print(label);
-  display.setFont(&FreeMonoBold12pt7b);
-  display.setCursor(x, y + 20);
+  display.setFont(&FreeSansBold12pt7b);
+  display.setCursor(x, y + 22);
   display.print(val);
 }
 
 void cellTemp(int x, int y, const char *label, float t) {
-  display.setFont(&FreeMono9pt7b);
+  display.setFont(&FreeSans9pt7b);
   display.setCursor(x, y);
   display.print(label);
-  display.setFont(&FreeMonoBold12pt7b);
-  printTempC(x, y + 20, t, 1, 2, 12);
+  display.setFont(&FreeSansBold12pt7b);
+  printTempC(x, y + 22, t, 1, 3, 14);
 }
 
-// ===================== ИКОНКИ ПОГОДЫ =====================
-void iconSun(int cx, int cy, int r) {
-  display.fillCircle(cx, cy, r, GxEPD_BLACK);
-  for (int a = 0; a < 360; a += 45) {
-    float rad = a * 3.14159f / 180.0f;
-    int x1 = cx + (int)(cos(rad) * (r + 5));
-    int y1 = cy + (int)(sin(rad) * (r + 5));
-    int x2 = cx + (int)(cos(rad) * (r + 14));
-    int y2 = cy + (int)(sin(rad) * (r + 14));
-    display.drawLine(x1, y1, x2, y2, GxEPD_BLACK);
+// ===================== ИКОНКИ (контурные, "полые" внутри) =====================
+// Все иконки рисуются контуром толщиной th пикселей. Облако — объединение скруглённого
+// прямоугольника и трёх кругов: для каждого пикселя считаем "глубину" внутри фигуры;
+// у границы (глубина < th) — чёрный, глубже — белый (заодно закрывает то, что за облаком).
+static float depthCircle(float px, float py, float cx, float cy, float r) {
+  float dx = px - cx, dy = py - cy;
+  return r - sqrtf(dx * dx + dy * dy);
+}
+
+static float depthRRect(float px, float py, float cx, float cy, float hx, float hy, float rr) {
+  float qx = fabsf(px - cx) - (hx - rr), qy = fabsf(py - cy) - (hy - rr);
+  float ox = fmaxf(qx, 0.0f), oy = fmaxf(qy, 0.0f);
+  return -(sqrtf(ox * ox + oy * oy) + fminf(fmaxf(qx, qy), 0.0f) - rr);
+}
+
+static void uiLine(int x1, int y1, int x2, int y2, int th) {
+  display.drawLine(x1, y1, x2, y2, GxEPD_BLACK);
+  if (th >= 2) {
+    display.drawLine(x1 + 1, y1, x2 + 1, y2, GxEPD_BLACK);
+    display.drawLine(x1, y1 + 1, x2, y2 + 1, GxEPD_BLACK);
+  }
+  if (th >= 3) {
+    display.drawLine(x1 + 1, y1 + 1, x2 + 1, y2 + 1, GxEPD_BLACK);
+    display.drawLine(x1 - 1, y1, x2 - 1, y2, GxEPD_BLACK);
   }
 }
 
-void iconMoon(int cx, int cy, int r) {
-  display.fillCircle(cx, cy, r, GxEPD_BLACK);
-  display.fillCircle(cx + r / 2, cy - r / 3, (int)(r * 0.85f), GxEPD_WHITE);
+static void uiRing(int cx, int cy, int r, int th) {
+  for (int k = 0; k < th; k++) display.drawCircle(cx, cy, r - k, GxEPD_BLACK);
 }
 
-void iconCloud(int cx, int cy, int scale) {
-  display.fillRoundRect(cx - scale, cy, scale * 2, (int)(scale * 0.8f), scale / 2, GxEPD_BLACK);
-  display.fillCircle(cx - scale / 2, cy, (int)(scale * 0.65f), GxEPD_BLACK);
-  display.fillCircle(cx + scale / 6, cy - scale / 4, (int)(scale * 0.8f), GxEPD_BLACK);
-  display.fillCircle(cx + scale, cy, (int)(scale * 0.55f), GxEPD_BLACK);
+// дуга окружности от угла a0 до a1 (градусы, по часовой от направления вправо; ось Y вниз)
+static void uiArc(int cx, int cy, float r, int a0, int a1, int th) {
+  for (int a = a0; a <= a1; a += 2) {
+    float rad = a * 0.0174533f;
+    for (int k = 0; k < th; k++) {
+      float rr = r - k;
+      display.drawPixel(cx + (int)lroundf(rr * cosf(rad)), cy + (int)lroundf(rr * sinf(rad)), GxEPD_BLACK);
+    }
+  }
 }
 
-// Большая иконка по тренду давления (слева вверху). (x, y) — левый верхний угол области ~90x70
-void drawWeatherIcon(int x, int y, Trend trend, bool night) {
-  int cx = x + 45, cy = y + 35;
-  switch (trend) {
-    case TREND_IMPROVING:
-      if (night) iconMoon(cx, cy, 20); else iconSun(cx, cy, 18);
+// облако: (cx, cy) — центр "якоря", s — масштаб
+static void cloudShape(int cx, int cy, float s, float th) {
+  int x0 = (int)(cx - 1.25f * s), x1 = (int)(cx + 1.65f * s);
+  int y0 = (int)(cy - 1.15f * s), y1 = (int)(cy + 0.90f * s);
+  float hh = 0.4f * s;
+  for (int y = y0; y <= y1; y++) {
+    for (int x = x0; x <= x1; x++) {
+      float px = x + 0.5f, py = y + 0.5f;
+      float d = depthRRect(px, py, (float)cx, cy + hh, s, hh, hh);
+      float d2 = depthCircle(px, py, cx - 0.5f * s, (float)cy, 0.65f * s);        if (d2 > d) d = d2;
+      d2 = depthCircle(px, py, cx + s / 6.0f, cy - 0.25f * s, 0.80f * s);         if (d2 > d) d = d2;
+      d2 = depthCircle(px, py, (float)cx + s, (float)cy, 0.55f * s);              if (d2 > d) d = d2;
+      if (d > 0.0f) display.drawPixel(x, y, d < th ? GxEPD_BLACK : GxEPD_WHITE);
+    }
+  }
+}
+
+// облако, нарисованное так, чтобы его ВИДИМЫЙ центр оказался в (cx, cy)
+static void cloudAt(int cx, int cy, float s, float th) {
+  cloudShape(cx - (int)lroundf(0.2f * s), cy + (int)lroundf(0.125f * s), s, th);
+}
+
+static void sunShape(int cx, int cy, float r, int th) {
+  uiRing(cx, cy, (int)lroundf(r), th);
+  for (int a = 0; a < 360; a += 45) {
+    float rad = a * 0.0174533f;
+    int x1 = cx + (int)lroundf(cosf(rad) * r * 1.55f), y1 = cy + (int)lroundf(sinf(rad) * r * 1.55f);
+    int x2 = cx + (int)lroundf(cosf(rad) * r * 2.35f), y2 = cy + (int)lroundf(sinf(rad) * r * 2.35f);
+    uiLine(x1, y1, x2, y2, th);
+  }
+}
+
+static void moonShape(int cx, int cy, float r, float th) {
+  float bx = cx + r * 0.5f, by = cy - r / 3.0f, br = 0.85f * r;
+  int R = (int)ceilf(r) + 1;
+  for (int y = cy - R; y <= cy + R; y++) {
+    for (int x = cx - R; x <= cx + R; x++) {
+      float px = x + 0.5f, py = y + 0.5f;
+      float dA = sqrtf((px - cx) * (px - cx) + (py - cy) * (py - cy));
+      float dB = sqrtf((px - bx) * (px - bx) + (py - by) * (py - by));
+      if (dA <= r && dB >= br && ((r - dA) < th || (dB - br) < th)) display.drawPixel(x, y, GxEPD_BLACK);
+    }
+  }
+}
+
+// Универсальная иконка погоды. s — масштаб (прогноз: 14, большая иконка слева: 30).
+void drawIconKind(int cx, int cy, float s, IconKind k, bool night) {
+  float th = (s >= 36.0f) ? 4.0f : ((s >= 20.0f) ? 3.0f : ((s >= 16.0f) ? 2.5f : 2.0f));
+  int ith = (int)th;
+  switch (k) {
+    case K_SUN:
+      if (night) moonShape(cx, cy, s * 0.95f, th); else sunShape(cx, cy, s * 0.55f, ith);
       break;
-    case TREND_WORSENING:
-      iconCloud(cx, cy - 5, 22);
-      display.drawLine(cx - 15, cy + 25, cx - 22, cy + 38, GxEPD_BLACK);
-      display.drawLine(cx,      cy + 25, cx - 7,  cy + 38, GxEPD_BLACK);
-      display.drawLine(cx + 15, cy + 25, cx + 8,  cy + 38, GxEPD_BLACK);
+    case K_PART: {
+      int sx = cx - (int)lroundf(0.55f * s), sy = cy - (int)lroundf(0.50f * s);
+      if (night) moonShape(sx, sy, s * 0.62f, th); else sunShape(sx, sy, s * 0.42f, ith);
+      cloudAt(cx + (int)lroundf(0.25f * s), cy + (int)lroundf(0.20f * s), 0.8f * s, th);
       break;
-    case TREND_STABLE:
-      if (night) iconMoon(cx - 18, cy - 10, 13); else iconSun(cx - 18, cy - 10, 12);
-      iconCloud(cx + 12, cy + 8, 20);
+    }
+    case K_CLOUD:
+      cloudAt(cx, cy, s, th);
+      break;
+    case K_RAIN:
+      cloudAt(cx, cy - (int)lroundf(0.35f * s), 0.85f * s, th);
+      for (int j = -1; j <= 1; j++) {
+        int x = cx + (int)lroundf(j * 0.55f * s);
+        uiLine(x, cy + (int)lroundf(0.55f * s), x - (int)lroundf(0.2f * s), cy + (int)lroundf(1.0f * s), ith);
+      }
+      break;
+    case K_SNOW: {
+      cloudAt(cx, cy - (int)lroundf(0.35f * s), 0.85f * s, th);
+      int rr = (int)lroundf(0.14f * s); if (rr < 2) rr = 2;
+      for (int j = -1; j <= 1; j++) display.drawCircle(cx + (int)lroundf(j * 0.55f * s), cy + (int)lroundf(0.8f * s), rr, GxEPD_BLACK);
+      break;
+    }
+    case K_STORM: {
+      cloudAt(cx, cy - (int)lroundf(0.35f * s), 0.85f * s, th);
+      int bx = cx, by = cy + (int)lroundf(0.5f * s);
+      uiLine(bx + (int)lroundf(0.15f * s), by, bx - (int)lroundf(0.2f * s), by + (int)lroundf(0.4f * s), ith);
+      uiLine(bx - (int)lroundf(0.2f * s), by + (int)lroundf(0.4f * s), bx + (int)lroundf(0.2f * s), by + (int)lroundf(0.4f * s), ith);
+      uiLine(bx + (int)lroundf(0.2f * s), by + (int)lroundf(0.4f * s), bx - (int)lroundf(0.15f * s), by + (int)lroundf(0.9f * s), ith);
+      break;
+    }
+    case K_FOG:
+      for (int i = 0; i < 3; i++) {
+        int y = cy - (int)lroundf(0.5f * s) + (int)lroundf(i * 0.5f * s);
+        int w = (int)lroundf((1.2f - 0.3f * i) * s);
+        uiLine(cx - w, y, cx + w, y, ith);
+      }
       break;
     default:
-      display.drawCircle(cx, cy, 20, GxEPD_BLACK);
-      display.setFont(&FreeMonoBold12pt7b);
-      display.setCursor(cx - 7, cy + 7);
-      display.print("?");
+      uiRing(cx, cy, (int)lroundf(0.8f * s), ith);
       break;
   }
 }
 
-// Маленькая иконка по коду погоды WMO (для прогноза на 5 дней), центр (cx, cy), размер ~40x40
-void drawWmo(int cx, int cy, int code) {
-  if (code == 0) {
-    iconSun(cx, cy, 7);
-  } else if (code <= 2) {
-    iconSun(cx - 10, cy - 9, 5);
-    iconCloud(cx + 5, cy + 5, 11);
-  } else if (code == 3) {
-    iconCloud(cx - 2, cy, 14);
-  } else if (code == 45 || code == 48) {
-    for (int k = 0; k < 3; k++) display.drawFastHLine(cx - 16 + k * 3, cy - 10 + k * 9, 32 - k * 6, GxEPD_BLACK);
-  } else if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) {
-    iconCloud(cx - 2, cy - 6, 12);
-    for (int k = -1; k <= 1; k++) display.drawLine(cx + k * 10, cy + 10, cx + k * 10 - 4, cy + 19, GxEPD_BLACK);
-  } else if ((code >= 71 && code <= 77) || code == 85 || code == 86) {
-    iconCloud(cx - 2, cy - 6, 12);
-    for (int k = -1; k <= 1; k++) display.fillCircle(cx + k * 10, cy + 15, 2, GxEPD_BLACK);
-  } else if (code >= 95) {
-    iconCloud(cx - 2, cy - 6, 12);
-    display.drawLine(cx + 2, cy + 8, cx - 4, cy + 15, GxEPD_BLACK);
-    display.drawLine(cx - 4, cy + 15, cx + 3, cy + 15, GxEPD_BLACK);
-    display.drawLine(cx + 3, cy + 15, cx - 3, cy + 23, GxEPD_BLACK);
-  } else {
-    iconCloud(cx - 2, cy, 14);
+IconKind wmoKind(int code) {
+  if (code == 0) return K_SUN;
+  if (code <= 2) return K_PART;
+  if (code == 3) return K_CLOUD;
+  if (code == 45 || code == 48) return K_FOG;
+  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return K_RAIN;
+  if ((code >= 71 && code <= 77) || code == 85 || code == 86) return K_SNOW;
+  if (code >= 95) return K_STORM;
+  return K_CLOUD;
+}
+
+// Большая иконка по тренду давления (слева вверху). (x, y) — левый верхний угол области ~150x140
+void drawWeatherIcon(int x, int y, Trend trend, bool night) {
+  int cx = x + 77, cy = y + 71;
+  switch (trend) {
+    case TREND_IMPROVING: drawIconKind(cx, cy, 48.0f, K_SUN, night);  break;
+    case TREND_STABLE:    drawIconKind(cx, cy, 48.0f, K_PART, night); break;
+    case TREND_WORSENING: drawIconKind(cx, cy, 48.0f, K_RAIN, night); break;
+    default: {                                         // пока нет данных: просто большой "?" по центру
+      display.setFont(&FreeSansBold24pt7b);
+      display.setTextSize(3);
+      int16_t bx, by; uint16_t bw, bh;
+      display.getTextBounds("?", 0, 0, &bx, &by, &bw, &bh);
+      display.setCursor(cx - (int)bw / 2 - bx, cy - (int)bh / 2 - by);
+      display.print("?");
+      display.setTextSize(1);
+      break;
+    }
   }
+}
+
+// Маленькая иконка по коду погоды WMO (прогноз на 5 дней), центр (cx, cy)
+void drawWmo(int cx, int cy, int code) {
+  drawIconKind(cx, cy, 18.0f, wmoKind(code), false);
+}
+
+// ---- маленькие иконки для сетки показателей (~24x24, центр (cx, cy))
+#define IC_SUNRISE 0
+#define IC_SUNSET  1
+#define IC_DROP    2
+#define IC_GAUGE   3
+#define IC_THERMO  4
+#define IC_HOUSE   5
+#define IC_CO2     6
+#define IC_GPS     7
+#define IC_SIGNAL  8
+#define IC_CLOCK   9
+#define IC_GLOBE   10
+#define IC_OUTDOOR 11
+
+static void uiEllipse(int cx, int cy, float rx, float ry) {
+  for (int a = 0; a < 360; a += 3) {
+    float rad = a * 0.0174533f;
+    display.drawPixel(cx + (int)lroundf(rx * cosf(rad)), cy + (int)lroundf(ry * sinf(rad)), GxEPD_BLACK);
+  }
+}
+
+static void icDrop(int cx, int cy, float r, int th) {
+  float yc = cy + r * 0.667f;
+  uiArc(cx, (int)lroundf(yc), r, -27, 207, th);
+  int ax = cx, ay = (int)lroundf(cy - r * 1.5f);
+  int tx = (int)lroundf(r * 0.887f), ty = (int)lroundf(yc - r * 0.462f);
+  uiLine(ax, ay, cx + tx, ty, th);
+  uiLine(ax, ay, cx - tx, ty, th);
+}
+
+static void icSun(int cx, int cy, bool rise) {
+  display.drawFastHLine(cx - 11, cy + 7, 23, GxEPD_BLACK);
+  display.drawFastHLine(cx - 11, cy + 8, 23, GxEPD_BLACK);
+  uiRing(cx, cy + 7, 6, 2);
+  display.fillRect(cx - 8, cy + 9, 17, 6, GxEPD_WHITE);              // стираем нижнюю половину круга
+  uiLine(cx - 6, cy + 1, cx - 9, cy - 2, 2);                          // лучи
+  uiLine(cx + 6, cy + 1, cx + 9, cy - 2, 2);
+  uiLine(cx, cy - 8, cx, cy - 1, 2);                                  // стрелка
+  if (rise) { uiLine(cx, cy - 9, cx - 3, cy - 6, 2); uiLine(cx, cy - 9, cx + 3, cy - 6, 2); }
+  else      { uiLine(cx, cy - 1, cx - 3, cy - 4, 2); uiLine(cx, cy - 1, cx + 3, cy - 4, 2); }
+}
+
+static void drawSmallIcon(int id, int cx, int cy) {
+  switch (id) {
+    case IC_SUNRISE: icSun(cx, cy, true);  break;
+    case IC_SUNSET:  icSun(cx, cy, false); break;
+    case IC_DROP:    icDrop(cx, cy, 6.0f, 2); break;
+    case IC_GAUGE:
+      uiRing(cx, cy, 10, 2);
+      uiLine(cx, cy, cx + 5, cy - 6, 2);
+      display.fillCircle(cx, cy, 2, GxEPD_BLACK);
+      for (int a = -150; a <= -30; a += 60) {
+        float rad = a * 0.0174533f;
+        display.drawLine(cx + (int)lroundf(6.0f * cosf(rad)), cy + (int)lroundf(6.0f * sinf(rad)),
+                         cx + (int)lroundf(8.0f * cosf(rad)), cy + (int)lroundf(8.0f * sinf(rad)), GxEPD_BLACK);
+      }
+      break;
+    case IC_THERMO:
+      display.drawRoundRect(cx - 3, cy - 11, 7, 15, 3, GxEPD_BLACK);
+      display.drawRoundRect(cx - 4, cy - 12, 9, 17, 4, GxEPD_BLACK);
+      uiRing(cx, cy + 8, 5, 2);
+      display.drawFastHLine(cx - 2, cy + 4, 5, GxEPD_WHITE);
+      display.drawFastHLine(cx - 2, cy + 5, 5, GxEPD_WHITE);
+      display.fillRect(cx - 1, cy - 5, 3, 13, GxEPD_BLACK);
+      display.fillCircle(cx, cy + 8, 2, GxEPD_BLACK);
+      break;
+    case IC_HOUSE:
+      uiLine(cx - 11, cy - 1, cx, cy - 11, 2);
+      uiLine(cx, cy - 11, cx + 11, cy - 1, 2);
+      display.drawRect(cx - 8, cy - 1, 17, 12, GxEPD_BLACK);
+      display.drawRect(cx - 7, cy, 15, 10, GxEPD_BLACK);
+      icDrop(cx, cy + 5, 3.0f, 1);
+      break;
+    case IC_CO2:
+      cloudAt(cx, cy - 2, 6.0f, 2.0f);
+      display.drawCircle(cx - 6, cy + 9, 1, GxEPD_BLACK);
+      display.drawCircle(cx, cy + 10, 1, GxEPD_BLACK);
+      display.drawCircle(cx + 6, cy + 9, 1, GxEPD_BLACK);
+      break;
+    case IC_GPS:
+      uiRing(cx, cy, 7, 2);
+      display.fillCircle(cx, cy, 2, GxEPD_BLACK);
+      uiLine(cx - 11, cy, cx - 6, cy, 2);
+      uiLine(cx + 6, cy, cx + 11, cy, 2);
+      uiLine(cx, cy - 11, cx, cy - 6, 2);
+      uiLine(cx, cy + 6, cx, cy + 11, 2);
+      break;
+    case IC_SIGNAL:
+      display.fillCircle(cx, cy + 7, 2, GxEPD_BLACK);
+      uiArc(cx, cy + 7, 6.0f, -135, -45, 2);
+      uiArc(cx, cy + 7, 10.0f, -135, -45, 2);
+      uiArc(cx, cy + 7, 14.0f, -135, -45, 2);
+      break;
+    case IC_CLOCK:
+      uiRing(cx, cy, 10, 2);
+      uiLine(cx, cy, cx, cy - 6, 2);
+      uiLine(cx, cy, cx + 4, cy + 2, 2);
+      break;
+    case IC_GLOBE:                                    // значок "интернет"
+      uiRing(cx, cy, 10, 2);
+      display.drawFastHLine(cx - 10, cy, 21, GxEPD_BLACK);
+      display.drawFastVLine(cx, cy - 10, 21, GxEPD_BLACK);
+      uiEllipse(cx, cy, 5.0f, 10.0f);
+      break;
+    case IC_OUTDOOR:                                  // значок "наружный модуль на связи"
+      drawSmallIcon(IC_THERMO, cx - 6, cy);
+      uiArc(cx - 1, cy, 7.0f, -50, 50, 2);
+      uiArc(cx - 1, cy, 12.0f, -50, 50, 2);
+      break;
+    default: break;
+  }
+}
+
+// ячейка сетки с иконкой слева
+void cellI(int x, int y, int ic, const char *label, const char *val) {
+  drawSmallIcon(ic, x + 11, y + 9);
+  cell(x + 36, y, label, val);
+}
+
+void cellITemp(int x, int y, int ic, const char *label, float t) {
+  drawSmallIcon(ic, x + 11, y + 9);
+  cellTemp(x + 36, y, label, t);
+}
+
+// "макс°|мин°" одной строкой по центру cx (пропорциональный шрифт, градус — кружком)
+void printTempPair(int cx, int y, int hi, int lo) {
+  char a[8], b[8];
+  snprintf(a, sizeof(a), "%d", hi);
+  snprintf(b, sizeof(b), "%d", lo);
+  display.setFont(&FreeSans9pt7b);
+  const int deg = 11, gap = 3;
+  int wa = textW(a), wb = textW(b), wbar = textW("|");
+  int total = wa + deg + gap + wbar + gap + wb + deg;
+  int x = cx - total / 2;
+  display.setCursor(x, y);                 display.print(a);
+  display.drawCircle(x + wa + 6, y - 9, 2, GxEPD_BLACK);
+  int xbar = x + wa + deg + gap;
+  display.setCursor(xbar, y);              display.print("|");
+  int xb = xbar + wbar + gap;
+  display.setCursor(xb, y);                display.print(b);
+  display.drawCircle(xb + wb + 6, y - 9, 2, GxEPD_BLACK);
 }
 
 // ===================== ГРАФИК ЗА 24 ЧАСА =====================
@@ -615,6 +992,11 @@ void drawGraph(int gx0, int gy0, int gx1, int gy1) {
   // --- шкала температуры
   float tmn = 1e9f, tmx = -1e9f;
   for (int i = 0; i < HN; i++) if (!isnan(tv[i])) { tmn = fminf(tmn, tv[i]); tmx = fmaxf(tmx, tv[i]); }
+  bool haveT = tmn <= tmx;
+  float rtmn = tmn, rtmx = tmx;                         // реальный диапазон для легенды
+  int hmn = 1000, hmx = -1;
+  for (int i = 0; i < HN; i++) if (hv[i] >= 0) { if (hv[i] < hmn) hmn = hv[i]; if (hv[i] > hmx) hmx = hv[i]; }
+  bool haveHum = hmx >= 0;
   if (tmn > tmx) { tmn = 0; tmx = 10; }
   int step = (tmx - tmn > 30.0f) ? 10 : 5;
   int lo = (int)floorf(tmn / step) * step;
@@ -623,18 +1005,19 @@ void drawGraph(int gx0, int gy0, int gx1, int gy1) {
   auto YT = [&](float v) { return gy1 - (int)((v - lo) * (gy1 - gy0) / (float)(hi - lo)); };
 
   // --- сетка и подписи слева (температура)
-  display.setFont(&FreeMono9pt7b);
+  display.setFont(&FreeSans9pt7b);
   char buf[24];
   for (int v = lo; v <= hi; v += step) {
     int y = YT(v);
     for (int x = gx0; x < gx1; x += 6) display.drawFastHLine(x, y, 2, GxEPD_BLACK);
     snprintf(buf, sizeof(buf), "%d", v);
-    printRight(gx0 - 6, y + 4, buf);
+    printRight(gx0 - 13, y + 4, buf);
+    display.drawCircle(gx0 - 9, y - 3, 2, GxEPD_BLACK);               // знак градуса
   }
   // --- подписи справа (влажность, 0-100 %)
-  display.setCursor(gx1 + 6, gy1 + 4);              display.print("0");
-  display.setCursor(gx1 + 6, (gy0 + gy1) / 2 + 4);  display.print("50");
-  display.setCursor(gx1 + 6, gy0 + 4);              display.print("100");
+  display.setCursor(gx1 + 6, gy1 + 4);              display.print("0%");
+  display.setCursor(gx1 + 6, (gy0 + gy1) / 2 + 4);  display.print("50%");
+  display.setCursor(gx1 + 6, gy0 + 4);              display.print("100%");
 
   // --- столбики влажности дома
   int bw = (gx1 - gx0) / (HN - 1) - 1;
@@ -687,20 +1070,26 @@ void drawGraph(int gx0, int gy0, int gx1, int gy1) {
     printCenter((gx0 + gx1) / 2, (gy0 + gy1) / 2, e ? "Collecting history..." : "No time source yet");
   }
 
-  // --- легенда
-  int ly = gy1 + 44;
-  int lx = gx0 - 20;
-  display.drawFastHLine(lx, ly - 4, 16, GxEPD_BLACK);
-  display.drawFastHLine(lx, ly - 3, 16, GxEPD_BLACK);
-  display.setCursor(lx + 22, ly); display.print("Out temp C");
-  lx += 22 + textW("Out temp C") + 14;
-  ditherBar(lx, ly, 14, 10);
-  display.setCursor(lx + 20, ly); display.print("In hum %");
-  lx += 20 + textW("In hum %") + 14;
-  for (int k = 0; k < 16; k += 6) display.drawFastHLine(lx + k, ly - 4, 3, GxEPD_BLACK);
+  // --- легенда: у каждой линии свой диапазон значений за 24 часа
+  // мелкий встроенный шрифт 6x8 — легенда почти незаметна
+  display.setFont(NULL);
+  display.setTextSize(1);
+  int ly = gy1 + 44;                                    // нижняя линия текста; у встроенного шрифта курсор — верх символа
+  int lx = gx0 - 30;
+  display.drawFastHLine(lx, ly - 4, 12, GxEPD_BLACK);
+  if (haveT) snprintf(buf, sizeof(buf), "Out %d..%d", (int)lroundf(rtmn), (int)lroundf(rtmx));
+  else       snprintf(buf, sizeof(buf), "Out temp C");
+  display.setCursor(lx + 16, ly - 7); display.print(buf);
+  lx += 16 + textW(buf) + 12;
+  ditherBar(lx, ly - 1, 10, 8);
+  if (haveHum) snprintf(buf, sizeof(buf), "In %d-%d%%", hmn, hmx);
+  else         snprintf(buf, sizeof(buf), "In hum %%");
+  display.setCursor(lx + 14, ly - 7); display.print(buf);
+  lx += 14 + textW(buf) + 12;
+  for (int k = 0; k < 12; k += 4) display.drawFastHLine(lx + k, ly - 4, 2, GxEPD_BLACK);
   if (havePress) snprintf(buf, sizeof(buf), "mmHg %d-%d", (int)lroundf(pmn), (int)lroundf(pmx));
   else           snprintf(buf, sizeof(buf), "mmHg");
-  display.setCursor(lx + 22, ly); display.print(buf);
+  display.setCursor(lx + 16, ly - 7); display.print(buf);
 }
 
 // ===================== ГЛАВНЫЙ ЭКРАН =====================
@@ -735,7 +1124,13 @@ void drawMain(float inT, float inH, float prHpa) {
 
   if (isnan(prHpa)) strcpy(sPress, "--- mmHg");
   else              snprintf(sPress, sizeof(sPress), "%.0f mmHg", prHpa * 0.750062f);
-  if (isnan(outH)) strcpy(sOutH, "-- %"); else snprintf(sOutH, sizeof(sOutH), "%.0f %%", outH);
+  // наружная температура/влажность: с модуля, а если его нет на связи — из интернета (прогноз "сейчас")
+  bool  outLink = zbLinkOk();
+  float dispT = NAN, dispH = NAN;
+  bool  fromWeb = false;
+  if (outLink) { dispT = outT; dispH = outH; }
+  else { float wt, wh; if (webOutdoor(wt, wh)) { dispT = wt; dispH = wh; fromWeb = true; } }
+  if (isnan(dispH)) strcpy(sOutH, "-- %"); else snprintf(sOutH, sizeof(sOutH), "%.0f %%", dispH);
   if (isnan(inH))  strcpy(sInH,  "-- %"); else snprintf(sInH,  sizeof(sInH),  "%.0f %%", inH);
   if (co2Val == 0) strcpy(sCo2, "--- ppm"); else snprintf(sCo2, sizeof(sCo2), "%u ppm", co2Val);
   snprintf(sSat, sizeof(sSat), "%u", (unsigned)gps.satellites.value());
@@ -758,6 +1153,19 @@ void drawMain(float inT, float inH, float prHpa) {
     case WE_NO_POS:    snprintf(sWifi, sizeof(sWifi), "Wi-Fi: connected, but position unknown (no GPS fix)"); break;
     default:           snprintf(sWifi, sizeof(sWifi), "Wi-Fi: first sync in a few minutes"); break;
   }
+  // подробная причина ошибки (то, что реально вернул сервер / стек), одна строка ~68 символов
+  if (cfg.ssid.length() && errDetail[0] && wifiErr != WE_OK && wifiErr != WE_UNKNOWN) {
+    char det[sizeof(errDetail)];
+    copyAscii(det, sizeof(det), errDetail);
+    if (wifiErr == WE_FC_FAIL || wifiErr == WE_NO_INET || wifiErr == WE_NO_POS) {
+      snprintf(sWifi, sizeof(sWifi), "Forecast error: %s", det);
+    } else {
+      char base[sizeof(sWifi)];
+      strlcpy(base, sWifi, sizeof(base));
+      snprintf(sWifi, sizeof(sWifi), "%s [%s]", base, det);
+    }
+    sWifi[68] = 0;
+  }
 
   display.init(115200, true, 50, false);
   display.setRotation(0);              // 800x480
@@ -768,81 +1176,98 @@ void drawMain(float inT, float inH, float prHpa) {
     display.setTextColor(GxEPD_BLACK);
     display.setTextSize(1);
 
-    // ---- слева вверху: иконка тренда + крупная наружная температура + "Feels like"
-    drawWeatherIcon(25, 25, trend, night);
-    display.setFont(&FreeMono9pt7b);
-    printCenter(70, 128, trendText(trend));
+    // ---- слева вверху: иконка тренда + крупная температура справа от неё + Feels like
+    drawWeatherIcon(-9, 1, trend, night);                 // центр иконки (68, 72)
+    display.setFont(&FreeSans9pt7b);
+    printCenter(68, 160, trendText(trend));
 
-    drawBigTemp(150, 108, outT);
-
-    display.setFont(&FreeMonoBold12pt7b);
-    display.setCursor(150, 142);
-    display.print("Feels like ");
-    if (!isnan(outT) && !isnan(outH)) printTempC(display.getCursorX(), 142, feelsLike(outT, outH), 1, 2, 12);
-    else display.print("--");
+    drawBigTemp(142, 75, dispT);
+    if (!isnan(dispT) && !isnan(dispH)) {
+      char sf[24];
+      snprintf(sf, sizeof(sf), "Feels like %d", (int)lroundf(feelsLike(dispT, dispH)));
+      display.setFont(&FreeSans12pt7b);
+      display.setCursor(144, 150);
+      display.print(sf);
+      display.drawCircle(display.getCursorX() + 5, 150 - 12, 3, GxEPD_BLACK);
+    }
 
     // ---- шапка справа
     if (online) {
-      display.setFont(&FreeMonoBold12pt7b);
-      if (fc.city[0]) printRight(790, 30, fc.city);
-      display.setFont(&FreeMono9pt7b);
-      if (fc.dist[0]) printRight(790, 50, fc.dist);
-      display.setFont(&FreeMonoBold12pt7b);
-      if (sDate[0]) printRight(790, 78, sDate);
-      display.setFont(&FreeMonoBold24pt7b);
-      printRight(790, 112, sTime);
+      // "город, район" крупно, под ним дата (больших часов нет — время внизу справа)
+      char pc[sizeof(fc.city)], pd[sizeof(fc.dist)], pr[sizeof(fc.region)], loc[80];
+      strlcpy(pc, fc.city, sizeof(pc));
+      strlcpy(pd, fc.dist, sizeof(pd));
+      strlcpy(pr, fc.region, sizeof(pr));
+      shortenRegion(pr);
+      shortenRegion(pd);
+      const char *pl1 = pc[0] ? pc : pr;
+      const char *pl2 = pd[0] ? pd : (pc[0] ? pr : "");
+      snprintf(loc, sizeof(loc), "%s%s%s", pl1, (pl1[0] && pl2[0]) ? ", " : "", pl2);
+      if (loc[0]) {
+        display.setFont(&FreeSansBold18pt7b);
+        if (textW(loc) > 410) display.setFont(&FreeSansBold12pt7b);
+        printRightFit(790, 36, loc, 410);
+      }
+      if (sDate[0]) {
+        display.setFont(&FreeSans12pt7b);
+        printRight(790, 66, sDate);
+      }
 
       // ---- прогноз на 5 дней
       for (int i = 0; i < fcCnt; i++) {
         int k = fcFirst + i;
-        int cx = 509 + i * 62;
+        int cx = 414 + i * 84;
         int32_t days = daysFromCivil((int)(fc.date[k] / 10000), (unsigned)((fc.date[k] / 100) % 100), (unsigned)(fc.date[k] % 100));
-        display.setFont(&FreeMono9pt7b);
-        printCenter(cx, 148, WD3[(days + 4) % 7]);
-        drawWmo(cx, 175, fc.code[k]);
-        char b[8];
-        display.setFont(&FreeMonoBold12pt7b);
-        snprintf(b, sizeof(b), "%d", (int)fc.tmax[k]);
-        printCenter(cx, 212, b);
-        display.setFont(&FreeMono9pt7b);
-        snprintf(b, sizeof(b), "%d", (int)fc.tmin[k]);
-        printCenter(cx, 230, b);
+        display.setFont(&FreeSans12pt7b);
+        printCenter(cx, 112, WD3[(days + 4) % 7]);
+        drawWmo(cx, 152, fc.code[k]);
+        printTempPair(cx, 200, (int)fc.tmax[k], (int)fc.tmin[k]);   // "макс°|мин°"
       }
     } else {
       // нет интернета: только время и дата, крупно
-      display.setFont(&FreeMonoBold24pt7b);
+      display.setFont(&FreeSansBold24pt7b);
       display.setTextSize(2);
-      printRight(790, 88, sTime);
+      printRight(790, 80, sTime);
       display.setTextSize(1);
-      display.setFont(&FreeMonoBold12pt7b);
-      if (sDate[0]) printRight(790, 120, sDate);
+      display.setFont(&FreeSans12pt7b);
+      if (sDate[0]) printRight(790, 116, sDate);
     }
 
-    // ---- сетка показателей (2 колонки x 5 строк)
-    const int c1 = 15, c2 = 165;
-    cell(c1, 250, "Sunrise", sRise);
-    cell(c2, 250, "Sunset", sSet);
-    cell(c1, 293, "Out humidity", sOutH);
-    cell(c2, 293, "Pressure", sPress);
-    cellTemp(c1, 336, "In temp", inT);
-    cell(c2, 336, "In humidity", sInH);
-    cell(c1, 379, "CO2", sCo2);
-    cell(c2, 379, "GPS sats", sSat);
-    cell(c1, 422, "Outdoor link", sLink);
-    cell(c2, 422, "Updated", sTime);
+    // ---- сетка показателей (2 колонки x 4 строки)
+    const int c1 = 12, c2 = 170;
+    cellI(c1, 212, IC_SUNRISE, "Sunrise", sRise);
+    cellI(c2, 212, IC_SUNSET,  "Sunset", sSet);
+    cellI(c1, 268, IC_HOUSE,   "In humidity", sInH);
+    cellI(c2, 268, IC_DROP,    "Out hum.", sOutH);
+    cellITemp(c1, 324, IC_THERMO, "In temp", inT);
+    cellI(c2, 324, IC_GAUGE,   "Pressure", sPress);
+    cellI(c1, 380, IC_CO2,     "CO2", sCo2);
+    cellI(c2, 380, IC_GPS,     "GPS sats", sSat);
+
+    // ---- значки состояния слева внизу: показываем только то, что сейчас работает
+    //      (слот 1: интернет, слот 2: наружный модуль, слот 3: батарея — добавим позже)
+    //      порядок слева направо: время, интернет, батарея (слот зарезервирован), наружный модуль
+    if (online && lt.haveDate) {
+      display.setFont(&FreeSans9pt7b);
+      display.setCursor(12, 456);
+      display.print(sTime);
+    }
+    if (cfg.ssid.length() && wifiErr == WE_OK) drawSmallIcon(IC_GLOBE,   88, 451);
+    // drawSmallIcon(IC_BATTERY, 126, 451);       // слот под заряд
+    if (outLink)                               drawSmallIcon(IC_OUTDOOR, 164, 451);
 
     // ---- состояние Wi-Fi внизу: только пока не настроено или при ошибке.
     // Если всё хорошо (ssid задан и последняя синхронизация успешна) — строку не рисуем совсем.
     bool showWifi = (cfg.ssid.length() == 0) || (wifiErr != WE_OK);
     if (showWifi) {
-      display.setFont(&FreeMono9pt7b);
+      display.setFont(&FreeSans9pt7b);
       display.setCursor(15, 474);
       display.print(sWifi);
     }
 
     // ---- график
-    if (online) drawGraph(350, 255, 745, 412);
-    else        drawGraph(350, 175, 745, 412);
+    if (online) drawGraph(365, 235, 740, 410);
+    else        drawGraph(365, 175, 740, 410);
   } while (display.nextPage());
   display.hibernate();
 }
@@ -871,64 +1296,6 @@ void drawConfigScreen(IPAddress ip) {
 }
 
 // ===================== СИНХРОНИЗАЦИЯ ЧЕРЕЗ WI-FI (прогноз, город, NTP) =====================
-bool httpsGet(const String &url, String &body) {
-  // --- диагностика: DNS, голый TCP, затем TLS ---
-  String host = url.substring(url.indexOf("://") + 3);
-  host = host.substring(0, host.indexOf('/'));
-
-  IPAddress ip;
-  bool dnsOk = WiFi.hostByName(host.c_str(), ip);
-  Serial.printf("httpsGet: DNS %s -> %s\n", host.c_str(), dnsOk ? ip.toString().c_str() : "FAIL");
-
-  {
-    WiFiClient t;
-    uint32_t t0 = millis();
-    bool a = dnsOk && t.connect(ip, 443, 5000);
-    Serial.printf("httpsGet: TCP %s: %d errno=%d %ums\n", host.c_str(), a, errno, (unsigned)(millis() - t0));
-    t.stop();
-
-    t0 = millis();
-    bool b = t.connect("google.com", 443, 5000);
-    Serial.printf("httpsGet: TCP google.com: %d errno=%d %ums\n", b, errno, (unsigned)(millis() - t0));
-    t.stop();
-  }
-
-  WiFiClientSecure client;
-  client.setInsecure();                // без проверки сертификата (данные не секретные)
-
-  if (!client.connect(host.c_str(), 443, 8000)) {
-    char e[100] = {0};
-    int le = client.lastError(e, sizeof(e));
-    Serial.printf("httpsGet: TLS connect FAIL, lastError=%d (%s)\n", le, e);
-  } else {
-    Serial.println("httpsGet: TLS connect OK");
-  }
-  client.stop();
-
-  // --- сам запрос ---
-  HTTPClient http;
-  http.setTimeout(10000);
-  http.setUserAgent("EInkMeteo/1.0 (ESP32 weather station)");
-  if (!http.begin(client, url)) {
-    Serial.println("httpsGet: http.begin() failed (плохой URL?)");
-    return false;
-  }
-  Serial.printf("httpsGet: GET %s  (free heap=%u)\n", url.c_str(), ESP.getFreeHeap());
-  int code = http.GET();
-  if (code < 0) {
-    Serial.printf("httpsGet: ошибка соединения, код=%d (%s)\n", code, HTTPClient::errorToString(code).c_str());
-    http.end();
-    return false;
-  }
-  if (code == HTTP_CODE_OK) {
-    body = http.getString();
-  } else {
-    Serial.printf("httpsGet: сервер ответил HTTP %d, тело: %s\n", code, http.getString().c_str());
-  }
-  http.end();
-  return code == HTTP_CODE_OK;
-}
-
 void copyAscii(char *dst, size_t n, const char *src) {   // шрифты только ASCII — остальное отбрасываем
   size_t j = 0;
   for (size_t i = 0; src && src[i] && j + 1 < n; i++) {
@@ -938,57 +1305,164 @@ void copyAscii(char *dst, size_t n, const char *src) {   // шрифты тол�
   dst[j] = 0;
 }
 
+// ---- MET Norway Locationforecast (бесплатно, без ключа, коммерческое использование разрешено)
+// ОБЯЗАТЕЛЬНО замени контакт на свою настоящую почту или ссылку на проект:
+// без осмысленного User-Agent сервер отвечает 403.
+#define API_USER_AGENT "EInkMeteo/1.0 daria.korsun.a@gmail.com"
+
+// symbol_code MET Norway ("partlycloudy_day", "lightrainshowers_night", ...) -> код WMO для drawWmo()
+static uint8_t metSymbolToWmo(const char *s) {
+  if (!s || !s[0])                return 3;
+  if (strstr(s, "thunder"))       return 95;
+  if (strstr(s, "sleet"))         return 67;
+  if (strstr(s, "snow"))          return 73;
+  if (strstr(s, "rain"))          return 61;
+  if (strstr(s, "fog"))           return 45;
+  if (strstr(s, "partlycloudy"))  return 2;
+  if (strstr(s, "cloudy"))        return 3;
+  if (strstr(s, "fair"))          return 0;
+  if (strstr(s, "clearsky"))      return 0;
+  return 3;
+}
+
+struct DayAgg {
+  uint32_t date;     // YYYYMMDD (местная дата)
+  float    tmax, tmin;
+  int      bestDiff; // минут до полудня у выбранной точки для иконки
+  uint8_t  code;
+};
+
 bool fetchForecast(float la, float lo) {
-  char url[256];
+  char url[160];
   snprintf(url, sizeof(url),
-           "https://api.open-meteo.com/v1/forecast?latitude=%.4f&longitude=%.4f"
-           "&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5",
-           la, lo);
-  String body;
-  if (!httpsGet(url, body)) return false;
-  JsonDocument doc;
-  DeserializationError je = deserializeJson(doc, body);
-  if (je) {
-    Serial.printf("fetchForecast: ошибка разбора JSON: %s\n", je.c_str());
-    Serial.printf("fetchForecast: тело ответа (первые 300 символов): %.300s\n", body.c_str());
+           "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=%.4f&lon=%.4f", la, lo);
+
+  WiFiClientSecure client;
+  client.setInsecure();
+  HTTPClient http;
+  http.useHTTP10(true);                // без chunked-кодирования, чтобы читать поток напрямую
+  http.setTimeout(15000);
+  http.setUserAgent(API_USER_AGENT);
+  if (!http.begin(client, url)) {
+    setErrDetail("http.begin failed");
     return false;
   }
-  JsonArray tm = doc["daily"]["time"];
-  JsonArray wc = doc["daily"]["weather_code"];
-  JsonArray hi = doc["daily"]["temperature_2m_max"];
-  JsonArray lw = doc["daily"]["temperature_2m_min"];
-  if (tm.isNull() || wc.isNull() || hi.isNull() || lw.isNull()) {
-    Serial.println("fetchForecast: JSON разобрался, но нет ожидаемых полей daily.*");
-    Serial.printf("fetchForecast: тело ответа (первые 300 символов): %.300s\n", body.c_str());
+  Serial.printf("fetchForecast: GET %s (free heap=%u)\n", url, ESP.getFreeHeap());
+  int code = http.GET();
+  if (code != HTTP_CODE_OK && code != 203) {
+    if (code < 0) {
+      char tls[96] = {0};
+      int tlsErr = client.lastError(tls, sizeof(tls));
+      setErrDetail("%d %s, tls %d %s", code, HTTPClient::errorToString(code).c_str(), tlsErr, tls);
+    } else {
+      setErrDetail("HTTP %d", code);
+    }
+    http.end();
     return false;
   }
 
-  char keepCity[sizeof(fc.city)], keepDist[sizeof(fc.dist)];
+  // Ответ ~100 КБ: читаем потоком и оставляем только время, температуру и символ погоды
+  JsonDocument filter;
+  JsonObject f = filter["properties"]["timeseries"][0].to<JsonObject>();
+  f["time"] = true;
+  f["data"]["instant"]["details"]["air_temperature"] = true;
+  f["data"]["instant"]["details"]["relative_humidity"] = true;
+  f["data"]["next_1_hours"]["summary"]["symbol_code"] = true;
+  f["data"]["next_6_hours"]["summary"]["symbol_code"] = true;
+  f["data"]["next_12_hours"]["summary"]["symbol_code"] = true;
+
+  int contentLen = http.getSize();                       // -1, если сервер не сообщил длину
+  WaitStream ws(http.getStream(), 15000);
+  JsonDocument doc;
+  DeserializationError je = deserializeJson(doc, ws, DeserializationOption::Filter(filter));
+  http.end();
+  if (je) {
+    setErrDetail("JSON: %s, got %u of %d bytes", je.c_str(), (unsigned)ws.count, contentLen);
+    return false;
+  }
+  JsonArray ts = doc["properties"]["timeseries"];
+  if (ts.isNull() || ts.size() == 0) {
+    setErrDetail("reply has no timeseries");
+    return false;
+  }
+
+  // Сводим точки в дни по МЕСТНОЙ дате (cfg.tz): max/min температуры + символ ближе к полудню
+  DayAgg days[5];
+  int nd = 0;
+  // почасовые точки (температура/влажность "сейчас" из интернета, если наружный модуль недоступен)
+  uint32_t hEpoch = 0; int16_t hT[6]; uint8_t hH[6]; int nh = 0; bool hDone = false;
+  for (JsonObject e : ts) {
+    const char *tm = e["time"] | "";
+    int y, mo, d, h, mi;
+    if (sscanf(tm, "%d-%d-%dT%d:%d", &y, &mo, &d, &h, &mi) != 5) continue;
+    float t = e["data"]["instant"]["details"]["air_temperature"] | NAN;
+    if (!hDone && !isnan(t)) {
+      uint32_t ue = (uint32_t)((int64_t)daysFromCivil(y, mo, d) * 86400LL + h * 3600 + mi * 60);
+      if (nh == 0 || ue == hEpoch + (uint32_t)nh * 3600UL) {
+        if (nh == 0) hEpoch = ue;
+        float hum = e["data"]["instant"]["details"]["relative_humidity"] | NAN;
+        hT[nh] = (int16_t)lroundf(t * 10.0f);
+        hH[nh] = isnan(hum) ? 255 : (uint8_t)constrain((int)lroundf(hum), 0, 100);
+        if (++nh >= 6) hDone = true;
+      } else hDone = true;                               // дальше точки не почасовые
+    }
+
+    int64_t le = (int64_t)daysFromCivil(y, mo, d) * 86400LL + h * 3600 + mi * 60 + (int64_t)cfg.tz * 3600;
+    int32_t ldays = (int32_t)(le / 86400);
+    int lh = (int)((le % 86400) / 3600);
+    int ly, lm, ld;
+    civilFromDays(ldays, ly, lm, ld);
+    uint32_t key = (uint32_t)(ly * 10000 + lm * 100 + ld);
+
+    int idx;
+    if (nd > 0 && days[nd - 1].date == key) idx = nd - 1;
+    else if (nd < 5) { idx = nd++; days[idx] = { key, -1000.0f, 1000.0f, 100000, 3 }; }
+    else break;                                          // дальше 5 дней не нужно
+
+    if (!isnan(t)) {
+      if (t > days[idx].tmax) days[idx].tmax = t;
+      if (t < days[idx].tmin) days[idx].tmin = t;
+    }
+    const char *sym = e["data"]["next_6_hours"]["summary"]["symbol_code"] | "";
+    if (!sym[0]) sym = e["data"]["next_12_hours"]["summary"]["symbol_code"] | "";
+    if (!sym[0]) sym = e["data"]["next_1_hours"]["summary"]["symbol_code"] | "";
+    int diff = abs(lh * 60 + mi - 12 * 60);
+    if (sym[0] && diff < days[idx].bestDiff) {
+      days[idx].bestDiff = diff;
+      days[idx].code = metSymbolToWmo(sym);
+    }
+  }
+
+  char keepCity[sizeof(fc.city)], keepDist[sizeof(fc.dist)], keepReg[sizeof(fc.region)];
   memcpy(keepCity, fc.city, sizeof(keepCity));
   memcpy(keepDist, fc.dist, sizeof(keepDist));
+  memcpy(keepReg,  fc.region, sizeof(keepReg));
   memset(&fc, 0, sizeof(fc));
   memcpy(fc.city, keepCity, sizeof(keepCity));
   memcpy(fc.dist, keepDist, sizeof(keepDist));
+  memcpy(fc.region, keepReg, sizeof(keepReg));
+  fc.hourEpoch = hEpoch;
+  fc.nHour = (uint8_t)nh;
+  for (int i = 0; i < nh; i++) { fc.hourT[i] = hT[i]; fc.hourH[i] = hH[i]; }
 
   int n = 0;
-  for (int i = 0; i < 5 && i < (int)tm.size(); i++) {
-    int y = 0, m = 0, d = 0;
-    const char *s = tm[i];
-    if (!s || sscanf(s, "%d-%d-%d", &y, &m, &d) != 3) continue;
-    fc.date[n] = (uint32_t)(y * 10000 + m * 100 + d);
-    fc.code[n] = (uint8_t)wc[i].as<int>();
-    fc.tmax[n] = (int8_t)lroundf(hi[i].as<float>());
-    fc.tmin[n] = (int8_t)lroundf(lw[i].as<float>());
+  for (int i = 0; i < nd; i++) {
+    if (days[i].tmax < -999.0f) continue;                // в этом дне не было температур
+    fc.date[n] = days[i].date;
+    fc.code[n] = days[i].code;
+    fc.tmax[n] = (int8_t)lroundf(days[i].tmax);
+    fc.tmin[n] = (int8_t)lroundf(days[i].tmin);
     n++;
   }
-  if (n == 0) return false;
+  Serial.printf("fetchForecast: получено дней: %d\n", n);
+  if (n == 0) { setErrDetail("no days parsed"); return false; }
   fc.n = (uint8_t)n;
   fc.magic = FCMAGIC;
   return true;
 }
 
 // Транслитерация кириллицы (UTF-8) в латиницу — шрифты на экране умеют только
-// ASCII, а Dadata отдаёт город/район по-русски. "Москва" -> "Moskva".
+// ASCII, а геокодер может отдать город/район по-русски. "Москва" -> "Moskva".
 void translitRu(char *dst, size_t n, const char *src) {
   static const char *T[32] = {
     "A","B","V","G","D","E","Zh","Z","I","Y","K","L","M","N","O","P",
@@ -1018,42 +1492,53 @@ void translitRu(char *dst, size_t n, const char *src) {
   dst[j] = 0;
 }
 
-// Геокодирование через Dadata (российский сервис, нужен бесплатный ключ с dadata.ru,
-// раздел "Подбор по координатам" / Geolocate API). Без ключа — просто не показываем город.
+// Название города/района по координатам: OpenStreetMap Nominatim (бесплатно, без ключа).
+// Правила сервиса: осмысленный User-Agent (используем API_USER_AGENT) и не чаще 1 запроса в секунду.
+// Просим названия на английском (accept-language=en); если английского названия нет, придёт кириллица —
+// translitRu() превратит её в латиницу.
 bool fetchPlace(float la, float lo) {
-  if (cfg.geoKey.length() == 0) return false;
-
+  char url[200];
+  snprintf(url, sizeof(url),
+           "https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=14&addressdetails=1&accept-language=en&lat=%.5f&lon=%.5f",
+           la, lo);
   WiFiClientSecure client;
   client.setInsecure();
   HTTPClient http;
-  http.setTimeout(8000);
-  if (!http.begin(client, "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address")) return false;
-  http.addHeader("Content-Type", "application/json");
+  http.setTimeout(10000);
+  http.setUserAgent(API_USER_AGENT);
+  if (!http.begin(client, url)) { Serial.println("fetchPlace: begin failed"); return false; }
   http.addHeader("Accept", "application/json");
-  http.addHeader("Authorization", String("Token ") + cfg.geoKey);
-
-  char body[96];
-  snprintf(body, sizeof(body), "{\"lat\":%.5f,\"lon\":%.5f,\"radius_meters\":100}", la, lo);
-  int code = http.POST((uint8_t *)body, strlen(body));
+  int code = http.GET();
   String resp;
   if (code == HTTP_CODE_OK) resp = http.getString();
   http.end();
-  if (code != HTTP_CODE_OK) return false;
+  if (code != HTTP_CODE_OK) { Serial.printf("fetchPlace: HTTP %d\n", code); return false; }
 
   JsonDocument doc;
-  if (deserializeJson(doc, resp)) return false;
-  JsonArray sug = doc["suggestions"];
-  if (sug.isNull() || sug.size() == 0) return false;
-  JsonObject d = sug[0]["data"];
+  DeserializationError je = deserializeJson(doc, resp);
+  if (je) { Serial.printf("fetchPlace: JSON %s\n", je.c_str()); return false; }
+  JsonObject ad = doc["address"];
+  if (ad.isNull()) { Serial.println("fetchPlace: no address in reply"); return false; }
 
-  const char *city = d["city"] | "";
-  if (!city[0]) city = d["settlement"] | "";
-  const char *dist = d["city_district"] | "";
-  if (!dist[0]) dist = d["area"] | "";
+  const char *city = ad["city"] | "";
+  if (!city[0]) city = ad["town"] | "";
+  if (!city[0]) city = ad["village"] | "";
+  if (!city[0]) city = ad["municipality"] | "";
+  if (!city[0]) city = "";
+  const char *dist = ad["city_district"] | "";
+  if (!dist[0]) dist = ad["suburb"] | "";
+  if (!dist[0]) dist = ad["borough"] | "";
+  if (!dist[0]) dist = ad["quarter"] | "";
+  if (!dist[0]) dist = ad["neighbourhood"] | "";
+  const char *region = ad["state"] | "";
+  if (!region[0]) region = ad["region"] | "";
+  if (!region[0]) region = ad["state_district"] | "";
 
   translitRu(fc.city, sizeof(fc.city), city);
   translitRu(fc.dist, sizeof(fc.dist), dist);
-  return fc.city[0] != 0;
+  translitRu(fc.region, sizeof(fc.region), region);
+  Serial.printf("fetchPlace: city='%s' district='%s' region='%s'\n", fc.city, fc.dist, fc.region);
+  return fc.city[0] || fc.region[0];
 }
 
 // Координаты по IP — запасной вариант, если GPS ещё не поймал спутники (точность: город)
@@ -1061,15 +1546,15 @@ bool fetchIpPosition() {
   WiFiClient client;
   HTTPClient http;
   http.setTimeout(8000);
-  if (!http.begin(client, "http://ip-api.com/json/?fields=status,lat,lon")) return false;
+  if (!http.begin(client, "http://ip-api.com/json/?fields=status,lat,lon")) { setErrDetail("ip-api: begin failed"); return false; }
   int code = http.GET();
   String body;
   if (code == HTTP_CODE_OK) body = http.getString();
   http.end();
-  if (code != HTTP_CODE_OK) return false;
+  if (code != HTTP_CODE_OK) { setErrDetail("no GPS fix; ip-api HTTP %d %s", code, code < 0 ? HTTPClient::errorToString(code).c_str() : ""); return false; }
   JsonDocument doc;
-  if (deserializeJson(doc, body)) return false;
-  if (strcmp(doc["status"] | "", "success") != 0) return false;
+  if (deserializeJson(doc, body)) { setErrDetail("no GPS fix; ip-api bad JSON"); return false; }
+  if (strcmp(doc["status"] | "", "success") != 0) { setErrDetail("no GPS fix; ip-api status fail"); return false; }
   homeLat = doc["lat"].as<float>();
   homeLon = doc["lon"].as<float>();
   prefs.putFloat("lat", homeLat);
@@ -1102,6 +1587,7 @@ uint8_t classifyWifiFail(uint8_t r) {
 
 void runSyncMode() {
   uint8_t err = WE_UNKNOWN;
+  errDetail[0] = 0;
   Serial.println("Sync mode: connecting to Wi-Fi");
   lastDiscReason = 0;
   WiFi.mode(WIFI_STA);
@@ -1129,6 +1615,7 @@ void runSyncMode() {
     if (isnan(homeLat)) fetchIpPosition();          // GPS ещё не поймал — берём примерно по IP
     if (isnan(homeLat)) {
       err = WE_NO_POS;
+      if (!errDetail[0]) setErrDetail("no GPS fix and no IP position");
     } else {
       fetchPlace(homeLat, homeLon);                 // город/район — необязательно
       if (fetchForecast(homeLat, homeLon)) {
@@ -1136,15 +1623,22 @@ void runSyncMode() {
         err = WE_OK;
       } else {
         err = ntpOk ? WE_FC_FAIL : WE_NO_INET;
+        if (!ntpOk) {                                   // добавим, что и NTP не ответил
+          char t[sizeof(errDetail)];
+          strlcpy(t, errDetail, sizeof(t));
+          setErrDetail("%s; no NTP", t);
+        }
       }
     }
   } else {
     err = classifyWifiFail(lastDiscReason);
+    setErrDetail("disconnect reason %u, status %d", (unsigned)lastDiscReason, (int)WiFi.status());
   }
 
   Serial.printf("Sync result: code=%u, last disconnect reason=%u\n", err, lastDiscReason);
   prefs.putUChar("werr", err);
-  prefs.putBool("syncfail", err != WE_OK);          // при неудаче следующая попытка только через 3 часа
+  prefs.putString("wdet", err == WE_OK ? "" : errDetail);
+  prefs.putBool("syncfail", err != WE_OK);          // при неудаче (Wi-Fi или прогноз) повтор через RETRY_MS
   WiFi.disconnect(true);
   WiFi.mode(WIFI_OFF);
   saveEpochForRestart();
@@ -1154,7 +1648,9 @@ void runSyncMode() {
 
 void syncCheck(uint32_t now) {
   if (cfg.ssid.length() == 0) return;
-  bool due = now > SYNC_PERIOD_MS || (fc.n == 0 && !syncFailFlag && now > FIRST_SYNC_MS);
+  bool due;
+  if (syncFailFlag) due = now > RETRY_MS;              // прошлая попытка не удалась — повтор через 2 минуты, пока не получится
+  else due = now > SYNC_PERIOD_MS || (fc.n == 0 && now > FIRST_SYNC_MS);
   if (!due) return;
   Serial.println("Rebooting into sync mode (Wi-Fi)");
   prefs.putBool("sync", true);
@@ -1219,9 +1715,6 @@ void handleRoot() {
   h += field("Refresh period at night, minutes", "nr", String(cfg.nightRefreshMin), "number", "min=1 max=1440");
   h += field("Time zone (UTC+N)", "tz", String(cfg.tz), "number", "min=-12 max=14");
   h += field("Fallback time (HH:MM), used only if no GPS and no Wi-Fi time", "time", "", "time", "");
-  h += "<h3>City / district (Dadata)</h3>";
-  h += "<p style='font-size:.85em'>Free API key from dadata.ru -&gt; Geolocate API. Leave empty to not show city.</p>";
-  h += field("Dadata API key", "geokey", cfg.geoKey, "text", "autocomplete='off'");
   h += "<h3>Outdoor module</h3>";
   h += field("Poll outdoor module every, seconds", "zbi", String(cfg.zbIntervalSec), "number", "min=10 max=3600");
   h += "<button type='submit'>Save and exit</button></form>";
@@ -1242,7 +1735,6 @@ void handleSave() {
   cfg.nightRefreshMin = constrain(server.arg("nr").toInt(), 1, 1440);
   cfg.zbIntervalSec   = constrain(server.arg("zbi").toInt(), 10, 3600);
   cfg.tz              = constrain(server.arg("tz").toInt(), -12, 14);
-  if (server.hasArg("geokey")) { cfg.geoKey = server.arg("geokey"); cfg.geoKey.trim(); }
   if (server.arg("time").length() >= 4) {
     int hh = 0, mm = 0;
     if (sscanf(server.arg("time").c_str(), "%d:%d", &hh, &mm) == 2) {
@@ -1340,6 +1832,7 @@ void setup() {
   bool wantSync    = prefs.getBool("sync", false);
   syncFailFlag     = prefs.getBool("syncfail", false);
   wifiErr          = prefs.getUChar("werr", WE_UNKNOWN);
+  { String d = prefs.getString("wdet", ""); d.toCharArray(errDetail, sizeof(errDetail)); }
   homeLat          = prefs.getFloat("lat", NAN);
   homeLon          = prefs.getFloat("lon", NAN);
 

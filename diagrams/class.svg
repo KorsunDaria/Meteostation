@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2350" height="3230">
+  <style>.t{font-family:Arial,Helvetica,sans-serif;fill:#000;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}.h{font-family:Arial,Helvetica,sans-serif;fill:#000}.s{fill:#fff;stroke:#000;stroke-width:1.6}.l{stroke:#000;stroke-width:1.4;fill:none}.d{stroke:#000;stroke-width:1.4;fill:none;stroke-dasharray:7 5}.sep{stroke:#000;stroke-width:1.2}.fr{fill:none;stroke:#000;stroke-width:1.4}</style>
+  <defs>
+    <marker markerUnits="userSpaceOnUse" orient="auto" refY="6" refX="11" markerHeight="12" markerWidth="12" id="o">
+      <path id="svg_1" stroke-width="1.5" stroke="#000" fill="none" d="m1,1l10,5l-10,5"/>
+    </marker>
+    <marker markerUnits="userSpaceOnUse" orient="auto" refY="8" refX="15" markerHeight="16" markerWidth="16" id="tr">
+      <path id="svg_2" stroke-width="1.4" stroke="#000" fill="#fff" d="m1,1l14,7l-14,7l0,-14z"/>
+    </marker>
+    <marker markerUnits="userSpaceOnUse" orient="auto" refY="6" refX="1" markerHeight="12" markerWidth="20" id="dm">
+      <path id="svg_3" stroke="#000" fill="#000" d="m1,6l9,-5l9,5l-9,5l-9,-5z"/>
+    </marker>
+  </defs>
+  <g>
+    <title>background</title>
+    <rect fill="none" id="canvas_background" height="602" width="802" y="-1" x="-1"/>
+  </g>
+  <g>
+    <title>Layer 1</title>
+    <rect id="svg_4" fill="#fff" height="3230" width="2350"/>
+    <text id="svg_6" class="h" font-weight="bold" font-size="24" text-anchor="start" y="84" x="40" style="white-space: pre;">Метеостанция: основной и наружный модули</text>
+    <line id="svg_8" stroke="#000" y2="95" x2="2310" y1="95" x1="40"/>
+    <rect id="svg_9" height="2136" width="2282" y="124" x="34" class="fr"/>
+    <text id="svg_11" class="h" font-weight="bold" font-size="15" y="148" x="47" style="white-space: pre;">Основной модуль (ESP32-C6) — main_module.ino</text>
+    <rect id="svg_12" height="630" width="1080" y="2320" x="34" class="fr"/>
+    <text id="svg_14" class="h" font-weight="bold" font-size="15" y="2344" x="48" style="white-space: pre;">Наружный модуль (ESP32-C6) — outdoor_module.ino</text>
+    <path id="svg_15" d="m370,939l22,0l0,-709l148,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_16" d="m370,951l34,0l0,-509l136,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_17" d="m370,963l46,0l0,-301l124,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_18" d="m370,975l58,0l0,-83l112,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_19" d="m370,1047l22,0l0,1093l148,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_20" d="m370,1035l34,0l0,873l136,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_21" d="m370,1023l46,0l0,681l124,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_22" d="m370,1011l58,0l0,571l112,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_23" d="m370,999l70,0l0,489l100,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_24" d="m370,987l82,0l0,83l88,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_25" d="m850,424l1130,0" class="d"/>
+    <path id="svg_26" d="m850,902l1130,0" class="d"/>
+    <path id="svg_27" d="m850,1052l1130,0" class="d"/>
+    <path id="svg_28" d="m850,1564l1130,0" class="d"/>
+    <path id="svg_29" d="m900,1686l1080,0" class="d"/>
+    <path id="svg_30" d="m850,2122l1130,0" class="d"/>
+    <path id="svg_31" d="m1980,424l0,1698" class="d"/>
+    <path id="svg_32" d="m1980,1273l70,0" marker-end="url(#tr)" class="d"/>
+    <path id="svg_33" d="m850,230l170,0" marker-end="url(#o)" class="d"/>
+    <path id="svg_34" d="m850,497l170,0" marker-end="url(#tr)" class="d"/>
+    <path id="svg_35" d="m1400,497l140,0" marker-end="url(#o)" class="d"/>
+    <path id="svg_36" d="m850,648l170,0" marker-end="url(#tr)" class="d"/>
+    <path id="svg_37" d="m850,696l690,0" marker-end="url(#o)" class="d"/>
+    <path id="svg_38" d="m850,718l170,0" marker-end="url(#o)" class="d"/>
+    <path id="svg_39" d="m850,874l40,0l0,-50l130,0" marker-end="url(#o)" class="d"/>
+    <path id="svg_40" d="m850,930l170,0" marker-end="url(#o)" class="d"/>
+    <path id="svg_new_main_sd" d="M370,1091H464V975H1020" marker-end="url(#o)" class="d"/>
+    <path id="svg_new_hist_sensors" d="M850,946H950V1722H1020" marker-end="url(#o)" class="d"/>
+    <path id="svg_41" d="m850,1112l170,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_42" d="m850,1136l36,0l0,188l134,0" marker-end="url(#o)" class="d"/>
+    <path id="svg_43" d="m850,1124l60,0l0,96l110,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_44" d="m1400,1294l26,0l0,-188l114,0" marker-end="url(#o)" class="d"/>
+    <path id="svg_45" d="m1400,1316l48,0l0,-102l92,0" marker-end="url(#o)" class="d"/>
+    <path id="svg_46" d="m1400,1372l140,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_47" d="m1690,1332l0,-60" marker-end="url(#o)" class="d"/>
+    <path id="svg_48" d="m850,1486l170,0" marker-end="url(#o)" class="d"/>
+    <path id="svg_49" d="m850,1592l170,0" marker-end="url(#o)" class="d"/>
+    <path id="svg_50" d="m900,1738l120,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_51" d="m900,1800l120,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_52" d="m850,1914l170,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_53" d="m1240,1938l0,56" marker-end="url(#tr)" class="d"/>
+    <path id="svg_54" d="m370,2653l30,0l0,-239l140,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_55" d="m370,2775l30,0l0,83l140,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_56" d="m370,2692l170,0" marker-start="url(#dm)" class="l"/>
+    <path id="svg_57" d="m640,2662l0,-60" marker-end="url(#o)" class="d"/>
+    <path id="svg_58" d="m900,2534l50,0l0,318l-50,0" marker-end="url(#o)" class="d"/>
+    <path id="svg_59" d="m740,2232l0,152" class="l"/>
+    <rect id="svg_60" height="234" width="310" y="864" x="60" class="s"/>
+    <text id="svg_61" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="882" x="215" style="white-space: pre;">MainModuleController</text>
+    <line id="svg_62" y2="890" x2="370" y1="890" x1="60" class="sep"/>
+    <text id="svg_63" class="h" font-size="12.5" y="907" x="69" style="white-space: pre;">-settings: SettingsController</text>
+    <text id="svg_64" class="h" font-size="12.5" y="923" x="69" style="white-space: pre;">-storage: StorageManager</text>
+    <text id="svg_65" class="h" font-size="12.5" y="939" x="69" style="white-space: pre;">-timeManager: TimeManager</text>
+    <text id="svg_66" class="h" font-size="12.5" y="955" x="69" style="white-space: pre;">-history: HistoryManager</text>
+    <text id="svg_67" class="h" font-size="12.5" y="971" x="69" style="white-space: pre;">-network: ConnectionController</text>
+    <text id="svg_68" class="h" font-size="12.5" y="987" x="69" style="white-space: pre;">-portal: ConfigPortal</text>
+    <text id="svg_69" class="h" font-size="12.5" y="1003" x="69" style="white-space: pre;">-button: ButtonController</text>
+    <text id="svg_70" class="h" font-size="12.5" y="1019" x="69" style="white-space: pre;">-sensors: MeasurementController</text>
+    <text id="svg_71" class="h" font-size="12.5" y="1035" x="69" style="white-space: pre;">-zigbee: MyZigbeeGateway</text>
+    <text id="svg_72" class="h" font-size="12.5" y="1051" x="69" style="white-space: pre;">-displayController: DisplayController</text>
+    <line id="svg_73" y2="1058" x2="370" y1="1058" x1="60" class="sep"/>
+    <text id="svg_74" class="h" font-size="12.5" y="1075" x="69" style="white-space: pre;">+begin()</text>
+    <text id="svg_75" class="h" font-size="12.5" y="1091" x="69" style="white-space: pre;">+update()</text>
+    <rect id="svg_76" height="60" width="310" y="200" x="540" class="s"/>
+    <text id="svg_77" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="218" x="695" style="white-space: pre;">SettingsController</text>
+    <line id="svg_78" y2="226" x2="850" y1="226" x1="540" class="sep"/>
+    <line id="svg_79" y2="236" x2="850" y1="236" x1="540" class="sep"/>
+    <text id="svg_80" class="h" font-size="12.5" y="253" x="549" style="white-space: pre;">+begin()</text>
+    <rect id="svg_82" height="92" width="310" y="632" x="540" class="s"/>
+    <text id="svg_83" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="650" x="695" style="white-space: pre;">StorageManager</text>
+    <line id="svg_84" y2="658" x2="850" y1="658" x1="540" class="sep"/>
+    <line id="svg_85" y2="668" x2="850" y1="668" x1="540" class="sep"/>
+    <text id="svg_86" class="h" font-size="12.5" y="685" x="549" style="white-space: pre;">+begin()</text>
+    <rect id="svg_89" height="124" width="310" y="412" x="540" class="s"/>
+    <text id="svg_90" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="430" x="695" style="white-space: pre;">TimeManager</text>
+    <line id="svg_91" y2="438" x2="850" y1="438" x1="540" class="sep"/>
+    <line id="svg_92" y2="448" x2="850" y1="448" x1="540" class="sep"/>
+    <text id="svg_93" class="h" font-size="12.5" y="465" x="549" style="white-space: pre;">+now(): uint32_t</text>
+    <text id="svg_94" class="h" font-size="12.5" y="481" x="549" style="white-space: pre;">+local(): LT</text>
+    <text id="svg_96" class="h" font-size="12.5" y="497" x="549" style="white-space: pre;">+night(): bool</text>
+    <text id="svg_97" class="h" font-size="12.5" y="513" x="549" style="white-space: pre;">+updateLocation()</text>
+    <text id="svg_99" class="h" font-size="12.5" y="529" x="549" style="white-space: pre;">+update(now: uint32_t)</text>
+    <rect id="svg_100" height="92" width="310" y="862" x="540" class="s"/>
+    <text id="svg_101" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="880" x="695" style="white-space: pre;">HistoryManager</text>
+    <line id="svg_102" y2="888" x2="850" y1="888" x1="540" class="sep"/>
+    <line id="svg_103" y2="898" x2="850" y1="898" x1="540" class="sep"/>
+    <text id="svg_104" class="h" font-size="12.5" y="915" x="549" style="white-space: pre;">+update(now: uint32_t)</text>
+    <rect id="svg_107" height="106" width="310" y="1040" x="540" class="s"/>
+    <text id="svg_108" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1058" x="695" style="white-space: pre;">ConnectionController</text>
+    <line id="svg_109" y2="1066" x2="850" y1="1066" x1="540" class="sep"/>
+    <text id="svg_110" class="h" font-size="12.5" y="1083" x="549" style="white-space: pre;">-wifi: WiFiGateway</text>
+    <text id="svg_111" class="h" font-size="12.5" y="1099" x="549" style="white-space: pre;">-scheduler: UpdateScheduler</text>
+    <line id="svg_112" y2="1106" x2="850" y1="1106" x1="540" class="sep"/>
+    <text id="svg_113" class="h" font-size="12.5" y="1123" x="549" style="white-space: pre;">+update(now: uint32_t)</text>
+    <text id="svg_114" class="h" font-size="12.5" y="1139" x="549" style="white-space: pre;">+synchronize()</text>
+    <rect id="svg_118" height="60" width="310" y="1458" x="540" class="s"/>
+    <text id="svg_119" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1476" x="695" style="white-space: pre;">ConfigPortal</text>
+    <line id="svg_120" y2="1484" x2="850" y1="1484" x1="540" class="sep"/>
+    <line id="svg_121" y2="1494" x2="850" y1="1494" x1="540" class="sep"/>
+    <text id="svg_122" class="h" font-size="12.5" y="1511" x="549" style="white-space: pre;">+run()</text>
+    <rect id="svg_123" height="60" width="310" y="1552" x="540" class="s"/>
+    <text id="svg_124" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1570" x="695" style="white-space: pre;">ButtonController</text>
+    <line id="svg_125" y2="1578" x2="850" y1="1578" x1="540" class="sep"/>
+    <line id="svg_126" y2="1588" x2="850" y1="1588" x1="540" class="sep"/>
+    <text id="svg_127" class="h" font-size="12.5" y="1605" x="549" style="white-space: pre;">+update(now: uint32_t)</text>
+    <rect id="svg_128" height="154" width="360" y="1674" x="540" class="s"/>
+    <text id="svg_129" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1692" x="720" style="white-space: pre;">MeasurementController</text>
+    <line id="svg_130" y2="1700" x2="900" y1="1700" x1="540" class="sep"/>
+    <text id="svg_131" class="h" font-size="12.5" y="1717" x="549" style="white-space: pre;">-indoorSensors: IndoorSensorsGateway</text>
+    <text id="svg_132" class="h" font-size="12.5" y="1733" x="549" style="white-space: pre;">-gpsGateway: GPSGateway</text>
+    <line id="svg_133" y2="1740" x2="900" y1="1740" x1="540" class="sep"/>
+    <text id="svg_134" class="h" font-size="12.5" y="1757" x="549" style="white-space: pre;">+update(now: uint32_t)</text>
+    <text id="svg_135" class="h" font-size="12.5" y="1773" x="549" style="white-space: pre;">+updateMeasurements(now: uint32_t)</text>
+    <text id="svg_136" class="h" font-size="12.5" y="1789" x="549" style="white-space: pre;">+updateCo2(now: uint32_t, force: bool = false)</text>
+    <text id="svg_137" class="h" font-size="12.5" y="1805" x="549" style="white-space: pre;">+updatePressure(now: uint32_t, force: bool = false)</text>
+    <text id="svg_138" class="h" font-size="12.5" y="1821" x="549" style="white-space: pre;">+readIndoor(temperature, humidity, pressureHpa: float&amp;)</text>
+    <rect id="svg_139" height="74" width="310" y="1878" x="540" class="s"/>
+    <text id="svg_140" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1896" x="695" style="white-space: pre;">DisplayController</text>
+    <line id="svg_141" y2="1904" x2="850" y1="1904" x1="540" class="sep"/>
+    <text id="svg_142" class="h" font-size="12.5" y="1921" x="549" style="white-space: pre;">-display: EInkDisplayGateway</text>
+    <line id="svg_143" y2="1928" x2="850" y1="1928" x1="540" class="sep"/>
+    <text id="svg_144" class="h" font-size="12.5" y="1945" x="549" style="white-space: pre;">+showMain(temperature, humidity, pressure: float)</text>
+    <rect id="svg_146" height="122" width="310" y="2110" x="540" class="s"/>
+    <text id="svg_147" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="2128" x="695" style="white-space: pre;">MyZigbeeGateway</text>
+    <line id="svg_148" y2="2136" x2="850" y1="2136" x1="540" class="sep"/>
+    <text id="svg_149" class="h" font-size="12.5" y="2153" x="549" style="white-space: pre;">-reportingConfigured: bool</text>
+    <text id="svg_150" class="h" font-size="12.5" y="2169" x="549" style="white-space: pre;">-lastOpenMs: uint32_t</text>
+    <text class="h" font-size="12.5" y="2185" x="549" style="white-space: pre;">-linkLost, prevLinkOk, pairedSaved: bool</text>
+    <line id="svg_151" y2="2192" x2="850" y1="2192" x1="540" class="sep"/>
+    <text id="svg_152" class="h" font-size="12.5" y="2209" x="549" style="white-space: pre;">+begin()</text>
+    <text id="svg_153" class="h" font-size="12.5" y="2225" x="549" style="white-space: pre;">+update(now: uint32_t)</text>
+    <rect id="svg_154" height="92" width="380" y="1082" x="1020" class="s"/>
+    <text id="svg_155" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1100" x="1210" style="white-space: pre;">WiFiGateway</text>
+    <line id="svg_156" y2="1108" x2="1400" y1="1108" x1="1020" class="sep"/>
+    <line id="svg_157" y2="1118" x2="1400" y1="1118" x1="1020" class="sep"/>
+    <text id="svg_158" class="h" font-size="12.5" y="1135" x="1029" style="white-space: pre;">+connected(): bool</text>
+    <text id="svg_159" class="h" font-size="12.5" y="1151" x="1029" style="white-space: pre;">+connect(): bool</text>
+    <text id="svg_160" class="h" font-size="12.5" y="1167" x="1029" style="white-space: pre;">+disconnect()</text>
+    <rect id="svg_161" height="60" width="380" y="1196" x="1020" class="s"/>
+    <text id="svg_162" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1214" x="1210" style="white-space: pre;">UpdateScheduler</text>
+    <line id="svg_163" y2="1222" x2="1400" y1="1222" x1="1020" class="sep"/>
+    <line id="svg_164" y2="1232" x2="1400" y1="1232" x1="1020" class="sep"/>
+    <text id="svg_165" class="h" font-size="12.5" y="1249" x="1029" style="white-space: pre;">+update(now: uint32_t)</text>
+    <rect id="svg_166" height="138" width="380" y="1284" x="1020" class="s"/>
+    <text id="svg_167" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1302" x="1210" style="white-space: pre;">ExternalForecastController</text>
+    <line id="svg_168" y2="1310" x2="1400" y1="1310" x1="1020" class="sep"/>
+    <text id="svg_169" class="h" font-size="12.5" y="1327" x="1029" style="white-space: pre;">-service: ForecastServiceGateway</text>
+    <line id="svg_170" y2="1334" x2="1400" y1="1334" x1="1020" class="sep"/>
+    <text id="svg_171" class="h" font-size="12.5" y="1351" x="1029" style="white-space: pre;">+getForecast(coordinates: const Coordinates&amp;): bool</text>
+    <text id="svg_172" class="h" font-size="12.5" y="1367" x="1029" style="white-space: pre;">+getAirQuality(coordinates: const Coordinates&amp;): AirQuality</text>
+    <text id="svg_173" class="h" font-size="12.5" y="1383" x="1029" style="white-space: pre;">+getUvIndex(coordinates: const Coordinates&amp;): bool</text>
+    <text id="svg_n_e1" class="h" font-size="12.5" y="1399" x="1029" style="white-space: pre;">+getPlace(coordinates: const Coordinates&amp;): bool</text>
+    <text id="svg_n_e2" class="h" font-size="12.5" y="1415" x="1029" style="white-space: pre;">+getIpPosition(): bool</text>
+    <rect id="svg_174" height="124" width="380" y="1332" x="1540" class="s"/>
+    <text id="svg_175" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1350" x="1730" style="white-space: pre;">ForecastServiceGateway</text>
+    <line id="svg_176" y2="1358" x2="1920" y1="1358" x1="1540" class="sep"/>
+    <line id="svg_177" y2="1368" x2="1920" y1="1368" x1="1540" class="sep"/>
+    <text id="svg_178" class="h" font-size="12.5" y="1385" x="1549" style="white-space: pre;">+getForecast(coordinates: const Coordinates&amp;): bool</text>
+    <text id="svg_179" class="h" font-size="12.5" y="1401" x="1549" style="white-space: pre;">+getAirQuality(coordinates: const Coordinates&amp;): bool</text>
+    <text id="svg_180" class="h" font-size="12.5" y="1417" x="1549" style="white-space: pre;">+getUvIndex(coordinates: const Coordinates&amp;): bool</text>
+    <text id="svg_n_g1" class="h" font-size="12.5" y="1433" x="1549" style="white-space: pre;">+getPlace(coordinates: const Coordinates&amp;): bool</text>
+    <text id="svg_n_g2" class="h" font-size="12.5" y="1449" x="1549" style="white-space: pre;">+getIpPosition(): bool</text>
+    <rect id="svg_181" height="76" width="380" y="1694" x="1020" class="s"/>
+    <text id="svg_182" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1712" x="1210" style="white-space: pre;">IndoorSensorsGateway</text>
+    <line id="svg_183" y2="1720" x2="1400" y1="1720" x1="1020" class="sep"/>
+    <line id="svg_184" y2="1730" x2="1400" y1="1730" x1="1020" class="sep"/>
+    <text id="svg_185" class="h" font-size="12.5" y="1747" x="1029" style="white-space: pre;">+read(temperature, humidity, pressureHpa: float&amp;)</text>
+    <text id="svg_n_rp" class="h" font-size="12.5" y="1763" x="1029" style="white-space: pre;">+readPressure(): float</text>
+    <rect id="svg_186" height="60" width="380" y="1784" x="1020" class="s"/>
+    <text id="svg_187" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1802" x="1210" style="white-space: pre;">GPSGateway</text>
+    <line id="svg_188" y2="1810" x2="1400" y1="1810" x1="1020" class="sep"/>
+    <line id="svg_189" y2="1820" x2="1400" y1="1820" x1="1020" class="sep"/>
+    <text id="svg_190" class="h" font-size="12.5" y="1837" x="1029" style="white-space: pre;">+update()</text>
+    <rect id="svg_191" height="60" width="440" y="1878" x="1020" class="s"/>
+    <text id="svg_192" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1896" x="1240" style="white-space: pre;">EInkDisplayGateway</text>
+    <line id="svg_193" y2="1904" x2="1460" y1="1904" x1="1020" class="sep"/>
+    <line id="svg_194" y2="1914" x2="1460" y1="1914" x1="1020" class="sep"/>
+    <text id="svg_195" class="h" font-size="12.5" y="1931" x="1029" style="white-space: pre;">+showMain(insideTemperature, insideHumidity, pressureHpa: float)</text>
+    <rect id="svg_197" height="76" width="460" y="914" x="1020" class="s"/>
+    <text id="svg_198" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="932" x="1250" style="white-space: pre;">SDCardController (global instance)</text>
+    <line id="svg_199" y2="940" x2="1480" y1="940" x1="1020" class="sep"/>
+    <line id="svg_200" y2="950" x2="1480" y1="950" x1="1020" class="sep"/>
+    <text id="svg_201" class="h" font-size="12.5" y="967" x="1029" style="white-space: pre;">+begin()</text>
+    <text id="svg_203" class="h" font-size="12.5" y="983" x="1029" style="white-space: pre;">+append(epoch, indoorT, indoorH, outdoorT, outdoorH, pressureMmHg, co2)</text>
+    <rect id="svg_204" height="60" width="380" y="1458" x="1020" class="s"/>
+    <text id="svg_205" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1476" x="1210" style="white-space: pre;">ResetForm</text>
+    <line id="svg_206" y2="1484" x2="1400" y1="1484" x1="1020" class="sep"/>
+    <line id="svg_207" y2="1494" x2="1400" y1="1494" x1="1020" class="sep"/>
+    <text id="svg_208" class="h" font-size="12.5" y="1511" x="1029" style="white-space: pre;">+confirmationForm(): String {const}</text>
+    <rect id="svg_209" height="60" width="380" y="1580" x="1020" class="s"/>
+    <text id="svg_210" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1598" x="1210" style="white-space: pre;">MeasurementRequest</text>
+    <line id="svg_211" y2="1606" x2="1400" y1="1606" x1="1020" class="sep"/>
+    <line id="svg_212" y2="1616" x2="1400" y1="1616" x1="1020" class="sep"/>
+    <text id="svg_213" class="h" font-size="12.5" y="1633" x="1029" style="white-space: pre;">+request()</text>
+    <rect id="svg_214" height="66" width="250" y="1240" x="2050" class="s"/>
+    <text id="svg_215" class="h" font-size="12" text-anchor="middle" y="1255" x="2175" style="white-space: pre;">«interface»</text>
+    <text id="svg_216" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1273" x="2175" style="white-space: pre;">IUpdatable</text>
+    <line id="svg_217" y2="1282" x2="2300" y1="1282" x1="2050" class="sep"/>
+    <text id="svg_218" class="h" font-style="italic" font-size="12.5" y="1299" x="2059" style="white-space: pre;">+update(now: uint32_t)</text>
+    <rect id="svg_219" height="66" width="380" y="602" x="1020" class="s"/>
+    <text id="svg_220" class="h" font-size="12" text-anchor="middle" y="617" x="1210" style="white-space: pre;">«interface»</text>
+    <text id="svg_221" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="635" x="1210" style="white-space: pre;">IStorage</text>
+    <line id="svg_222" y2="644" x2="1400" y1="644" x1="1020" class="sep"/>
+    <text id="svg_223" class="h" font-style="italic" font-size="12.5" y="661" x="1029" style="white-space: pre;">+begin()</text>
+    <rect id="svg_225" height="66" width="440" y="1994" x="1020" class="s"/>
+    <text id="svg_226" class="h" font-size="12" text-anchor="middle" y="2009" x="1240" style="white-space: pre;">«interface»</text>
+    <text id="svg_227" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="2027" x="1240" style="white-space: pre;">IDisplay</text>
+    <line id="svg_228" y2="2036" x2="1460" y1="2036" x1="1020" class="sep"/>
+    <text id="svg_229" class="h" font-style="italic" font-size="12.5" y="2053" x="1029" style="white-space: pre;">+showMain(insideTemperature, insideHumidity, pressureHpa: float)</text>
+    <rect id="svg_231" height="98" width="380" y="454" x="1020" class="s"/>
+    <text id="svg_232" class="h" font-size="12" text-anchor="middle" y="469" x="1210" style="white-space: pre;">«interface»</text>
+    <text id="svg_233" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="487" x="1210" style="white-space: pre;">IClock</text>
+    <line id="svg_234" y2="496" x2="1400" y1="496" x1="1020" class="sep"/>
+    <text id="svg_235" class="h" font-style="italic" font-size="12.5" y="513" x="1029" style="white-space: pre;">+now(): uint32_t</text>
+    <text id="svg_236" class="h" font-style="italic" font-size="12.5" y="529" x="1029" style="white-space: pre;">+local(): LT</text>
+    <text id="svg_237" class="h" font-style="italic" font-size="12.5" y="545" x="1029" style="white-space: pre;">+night(): bool</text>
+    <rect id="svg_238" height="194" width="380" y="200" x="1020" class="s"/>
+    <text id="svg_239" class="h" font-size="12" text-anchor="middle" y="215" x="1210" style="white-space: pre;">«struct»</text>
+    <text id="svg_240" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="233" x="1210" style="white-space: pre;">Settings</text>
+    <line id="svg_241" y2="242" x2="1400" y1="242" x1="1020" class="sep"/>
+    <text id="svg_242" class="h" font-size="12.5" y="259" x="1029" style="white-space: pre;">ssid, pass: String</text>
+    <text id="svg_243" class="h" font-size="12.5" y="275" x="1029" style="white-space: pre;">refreshMin, nightRefreshMin: uint16_t</text>
+    <text id="svg_244" class="h" font-size="12.5" y="291" x="1029" style="white-space: pre;">zbIntervalSec, clockSetMin: uint16_t</text>
+    <text id="svg_245" class="h" font-size="12.5" y="307" x="1029" style="white-space: pre;">nightStart, nightEnd: uint8_t</text>
+    <text id="svg_246" class="h" font-size="12.5" y="323" x="1029" style="white-space: pre;">tz: int8_t</text>
+    <text id="svg_247" class="h" font-size="12.5" y="339" x="1029" style="white-space: pre;">showAirQuality, showFeelsLike, showUvIndex: bool</text>
+    <text id="svg_248" class="h" font-size="12.5" y="355" x="1029" style="white-space: pre;">showPressure, showCo2: bool</text>
+    <text id="svg_249" class="h" font-size="12.5" y="371" x="1029" style="white-space: pre;">showIndoorHumidity, showOutdoorHumidity: bool</text>
+    <text class="h" font-size="12.5" y="387" x="1029" style="white-space: pre;">outdoorWebFirst: bool</text>
+    <rect id="svg_250" height="82" width="300" y="1190" x="1540" class="s"/>
+    <text id="svg_251" class="h" font-size="12" text-anchor="middle" y="1205" x="1690" style="white-space: pre;">«struct»</text>
+    <text id="svg_252" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1223" x="1690" style="white-space: pre;">Coordinates</text>
+    <line id="svg_253" y2="1232" x2="1840" y1="1232" x1="1540" class="sep"/>
+    <text id="svg_254" class="h" font-size="12.5" y="1249" x="1549" style="white-space: pre;">latitude, longitude: float</text>
+    <text id="svg_255" class="h" font-size="12.5" y="1265" x="1549" style="white-space: pre;">valid: bool</text>
+    <rect id="svg_256" height="82" width="300" y="1082" x="1540" class="s"/>
+    <text id="svg_257" class="h" font-size="12" text-anchor="middle" y="1097" x="1690" style="white-space: pre;">«struct»</text>
+    <text id="svg_258" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1115" x="1690" style="white-space: pre;">AirQuality</text>
+    <line id="svg_259" y2="1124" x2="1840" y1="1124" x1="1540" class="sep"/>
+    <text id="svg_260" class="h" font-size="12.5" y="1141" x="1549" style="white-space: pre;">europeanAqi: int16_t</text>
+    <text id="svg_261" class="h" font-size="12.5" y="1157" x="1549" style="white-space: pre;">available: bool</text>
+    <rect id="svg_262" height="178" width="300" y="632" x="1540" class="s"/>
+    <text id="svg_263" class="h" font-size="12" text-anchor="middle" y="647" x="1690" style="white-space: pre;">«struct»</text>
+    <text id="svg_264" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="665" x="1690" style="white-space: pre;">Forecast</text>
+    <line id="svg_265" y2="674" x2="1840" y1="674" x1="1540" class="sep"/>
+    <text id="svg_266" class="h" font-size="12.5" y="691" x="1549" style="white-space: pre;">magic: uint16_t</text>
+    <text id="svg_267" class="h" font-size="12.5" y="707" x="1549" style="white-space: pre;">n, nHour: uint8_t</text>
+    <text id="svg_268" class="h" font-size="12.5" y="723" x="1549" style="white-space: pre;">date[5], hourEpoch: uint32_t</text>
+    <text id="svg_269" class="h" font-size="12.5" y="739" x="1549" style="white-space: pre;">code[5]: uint8_t</text>
+    <text id="svg_270" class="h" font-size="12.5" y="755" x="1549" style="white-space: pre;">tmax[5], tmin[5]: int8_t</text>
+    <text id="svg_271" class="h" font-size="12.5" y="771" x="1549" style="white-space: pre;">city[28], dist[28], region[28]: char</text>
+    <text id="svg_272" class="h" font-size="12.5" y="787" x="1549" style="white-space: pre;">hourT[6]: int16_t</text>
+    <text id="svg_273" class="h" font-size="12.5" y="803" x="1549" style="white-space: pre;">hourH[6]: uint8_t</text>
+    <rect id="svg_274" height="130" width="380" y="708" x="1020" class="s"/>
+    <text id="svg_275" class="h" font-size="12" text-anchor="middle" y="723" x="1210" style="white-space: pre;">«struct»</text>
+    <text id="svg_276" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="741" x="1210" style="white-space: pre;">Hist</text>
+    <line id="svg_277" y2="750" x2="1400" y1="750" x1="1020" class="sep"/>
+    <text id="svg_278" class="h" font-size="12.5" y="767" x="1029" style="white-space: pre;">magic, headIdx: uint16_t</text>
+    <text id="svg_279" class="h" font-size="12.5" y="783" x="1029" style="white-space: pre;">headSlot: uint32_t</text>
+    <text id="svg_280" class="h" font-size="12.5" y="799" x="1029" style="white-space: pre;">t[HN]: int16_t</text>
+    <text id="svg_281" class="h" font-size="12.5" y="815" x="1029" style="white-space: pre;">h[HN]: uint8_t</text>
+    <text id="svg_282" class="h" font-size="12.5" y="831" x="1029" style="white-space: pre;">p[HN]: uint16_t</text>
+    <rect id="svg_283" height="82" width="300" y="454" x="1540" class="s"/>
+    <text id="svg_284" class="h" font-size="12" text-anchor="middle" y="469" x="1690" style="white-space: pre;">«struct»</text>
+    <text id="svg_285" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="487" x="1690" style="white-space: pre;">LT</text>
+    <line id="svg_286" y2="496" x2="1840" y1="496" x1="1540" class="sep"/>
+    <text id="svg_287" class="h" font-size="12.5" y="513" x="1549" style="white-space: pre;">haveDate: bool</text>
+    <text id="svg_288" class="h" font-size="12.5" y="529" x="1549" style="white-space: pre;">y, mo, d, h, mi, wd: int</text>
+    <rect id="svg_289" height="226" width="310" y="2619" x="60" class="s"/>
+    <text id="svg_290" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="2637" x="215" style="white-space: pre;">OutdoorModuleController</text>
+    <line id="svg_291" y2="2645" x2="370" y1="2645" x1="60" class="sep"/>
+    <text id="svg_292" class="h" font-size="12.5" y="2662" x="69" style="white-space: pre;">-bme: Adafruit_BME280</text>
+    <text id="svg_293" class="h" font-size="12.5" y="2678" x="69" style="white-space: pre;">-sensorReady: bool</text>
+    <text id="svg_294" class="h" font-size="12.5" y="2694" x="69" style="white-space: pre;">-lastMeasureMs: uint32_t</text>
+    <text id="svg_295" class="h" font-size="12.5" y="2710" x="69" style="white-space: pre;">-communication: MyZigbeeGateway</text>
+    <text id="svg_296" class="h" font-size="12.5" y="2726" x="69" style="white-space: pre;">-button: BindingResetController</text>
+    <text id="svg_297" class="h" font-size="12.5" y="2742" x="69" style="white-space: pre;">-latest: OutdoorReading</text>
+    <text id="svg_298" class="h" font-size="12.5" y="2758" x="69" style="white-space: pre;">-lastSensorErrorMs, lastSensorRetryMs: uint32_t</text>
+    <line id="svg_299" y2="2781" x2="370" y1="2781" x1="60" class="sep"/>
+    <text id="svg_300" class="h" font-size="12.5" y="2798" x="69" style="white-space: pre;">+begin()</text>
+    <text id="svg_301" class="h" font-size="12.5" y="2814" x="69" style="white-space: pre;">+update()</text>
+    <text class="h" font-size="12.5" y="2830" x="69" style="white-space: pre;">-initializeSensor()</text>
+    <rect id="svg_302" height="218" width="360" y="2384" x="540" class="s"/>
+    <text id="svg_303" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="2402" x="720" style="white-space: pre;">MyZigbeeGateway</text>
+    <line id="svg_304" y2="2410" x2="900" y1="2410" x1="540" class="sep"/>
+    <text id="svg_305" class="h" font-size="12.5" y="2427" x="549" style="white-space: pre;">-endpoint: ZigbeeTempSensor</text>
+    <text id="svg_306" class="h" font-size="12.5" y="2443" x="549" style="white-space: pre;">-wasConnected: bool</text>
+    <text id="svg_307" class="h" font-size="12.5" y="2459" x="549" style="white-space: pre;">-hasConnectedOnce: bool</text>
+    <text id="svg_308" class="h" font-size="12.5" y="2475" x="549" style="white-space: pre;">-disconnectedSinceMs: uint32_t</text>
+    <text id="svg_309" class="h" font-size="12.5" y="2491" x="549" style="white-space: pre;">-lastWaitLogMs: uint32_t</text>
+    <text id="svg_310" class="h" font-size="12.5" y="2507" x="549" style="white-space: pre;">-RECONNECT_GRACE_MS: uint32_t {static, const}</text>
+    <line id="svg_311" y2="2514" x2="900" y1="2514" x1="540" class="sep"/>
+    <text id="svg_312" class="h" font-size="12.5" y="2531" x="549" style="white-space: pre;">+begin(): bool</text>
+    <text id="svg_313" class="h" font-size="12.5" y="2547" x="549" style="white-space: pre;">+connected(): bool</text>
+    <text id="svg_314" class="h" font-size="12.5" y="2563" x="549" style="white-space: pre;">+update(now: uint32_t)</text>
+    <text id="svg_315" class="h" font-size="12.5" y="2579" x="549" style="white-space: pre;">+publish(r: OutdoorReading)</text>
+    <text id="svg_316" class="h" font-size="12.5" y="2595" x="549" style="white-space: pre;">+factoryReset()</text>
+    <rect id="svg_317" height="106" width="360" y="2662" x="540" class="s"/>
+    <text id="svg_318" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="2680" x="720" style="white-space: pre;">BindingResetController</text>
+    <line id="svg_319" y2="2688" x2="900" y1="2688" x1="540" class="sep"/>
+    <text id="svg_320" class="h" font-size="12.5" y="2705" x="549" style="white-space: pre;">-pressedAtMs: uint32_t</text>
+    <text id="svg_321" class="h" font-size="12.5" y="2721" x="549" style="white-space: pre;">-tracking: bool</text>
+    <text id="svg_322" class="h" font-size="12.5" y="2737" x="549" style="white-space: pre;">-resetDone: bool</text>
+    <line id="svg_323" y2="2744" x2="900" y1="2744" x1="540" class="sep"/>
+    <text id="svg_324" class="h" font-size="12.5" y="2761" x="549" style="white-space: pre;">+update(now: uint32_t, zigbee: MyZigbeeGateway&amp;)</text>
+    <rect id="svg_325" height="98" width="360" y="2828" x="540" class="s"/>
+    <text id="svg_326" class="h" font-size="12" text-anchor="middle" y="2843" x="720" style="white-space: pre;">«struct»</text>
+    <text id="svg_327" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="2861" x="720" style="white-space: pre;">OutdoorReading</text>
+    <line id="svg_328" y2="2870" x2="900" y1="2870" x1="540" class="sep"/>
+    <text id="svg_329" class="h" font-size="12.5" y="2887" x="549" style="white-space: pre;">temperatureC, humidityPct, pressureHpa: float</text>
+    <text id="svg_330" class="h" font-size="12.5" y="2903" x="549" style="white-space: pre;">temperatureValid, humidityValid: bool</text>
+    <text id="svg_402" class="h" font-size="12.5" y="2919" x="549" style="white-space: pre;">pressureValid: bool</text>
+    <text id="svg_331" class="t" font-size="12" text-anchor="end" y="225" x="534" style="white-space: pre;">1</text>
+    <text id="svg_332" class="t" font-size="12" text-anchor="end" y="437" x="534" style="white-space: pre;">1</text>
+    <text id="svg_333" class="t" font-size="12" text-anchor="end" y="657" x="534" style="white-space: pre;">1</text>
+    <text id="svg_334" class="t" font-size="12" text-anchor="end" y="887" x="534" style="white-space: pre;">1</text>
+    <text id="svg_335" class="t" font-size="12" text-anchor="end" y="2135" x="534" style="white-space: pre;">1</text>
+    <text id="svg_336" class="t" font-size="12" text-anchor="end" y="1903" x="534" style="white-space: pre;">1</text>
+    <text id="svg_337" class="t" font-size="12" text-anchor="end" y="1699" x="534" style="white-space: pre;">1</text>
+    <text id="svg_338" class="t" font-size="12" text-anchor="end" y="1577" x="534" style="white-space: pre;">1</text>
+    <text id="svg_339" class="t" font-size="12" text-anchor="end" y="1483" x="534" style="white-space: pre;">1</text>
+    <text id="svg_340" class="t" font-size="12" text-anchor="end" y="1065" x="534" style="white-space: pre;">1</text>
+    <text id="svg_341" class="t" font-size="12" text-anchor="end" y="1107" x="1014" style="white-space: pre;">1</text>
+    <text id="svg_342" class="t" font-size="12" text-anchor="end" y="1215" x="1014" style="white-space: pre;">1</text>
+    <text id="svg_343" class="t" font-size="12" text-anchor="end" y="1367" x="1534" style="white-space: pre;">1</text>
+    <text id="svg_344" class="t" font-size="12" text-anchor="end" y="1733" x="1014" style="white-space: pre;">1</text>
+    <text id="svg_345" class="t" font-size="12" text-anchor="end" y="1795" x="1014" style="white-space: pre;">1</text>
+    <text id="svg_346" class="t" font-size="12" text-anchor="end" y="1909" x="1014" style="white-space: pre;">1</text>
+    <text id="svg_347" class="t" font-size="12" text-anchor="end" y="2409" x="534" style="white-space: pre;">1</text>
+    <text id="svg_348" class="t" font-size="12" text-anchor="end" y="2853" x="534" style="white-space: pre;">1</text>
+    <text id="svg_349" class="t" font-size="12" text-anchor="end" y="2687" x="534" style="white-space: pre;">1</text>
+    <text id="svg_350" class="t" font-size="13" text-anchor="start" y="2240" x="750" style="white-space: pre;">1</text>
+    <text id="svg_351" class="t" font-style="italic" font-size="12" text-anchor="start" y="2240" x="766" style="white-space: pre;">coordinator</text>
+    <text id="svg_352" class="t" font-weight="bold" font-size="13" text-anchor="start" y="2282" x="750" style="white-space: pre;">Zigbee </text>
+    <text class="t" font-size="13" text-anchor="start" y="2300" x="750" style="white-space: pre;">температура, влажность</text>
+    <text id="svg_353" class="t" font-size="13" text-anchor="start" y="2370" x="750" style="white-space: pre;">1</text>
+    <text id="svg_354" class="t" font-style="italic" font-size="12" text-anchor="start" y="2370" x="766" style="white-space: pre;">end device</text>
+    <rect id="svg_366" height="75" width="300" y="811" x="2000" class="s"/>
+    <text id="svg_367" class="h" font-size="12" text-anchor="middle" y="826" x="2150" style="white-space: pre;">«struct»</text>
+    <text id="svg_368" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="844" x="2150" style="white-space: pre;">ErrorBar</text>
+    <line id="svg_369" y2="853" x2="2300" y1="853" x1="2000" class="sep"/>
+    <text id="svg_370" class="h" font-size="12.5" y="870" x="2009" style="white-space: pre;">epoch: uint32_t</text>
+    <text id="svg_371" class="h" font-size="12.5" y="882" x="2009" style="white-space: pre;">forecast10, actual10: int16_t</text>
+    <rect id="svg_372" height="90" width="300" y="894" x="2000" class="s"/>
+    <text id="svg_373" class="h" font-size="12" text-anchor="middle" y="909" x="2150" style="white-space: pre;">«struct»</text>
+    <text id="svg_374" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="927" x="2150" style="white-space: pre;">ErrorBarHistory</text>
+    <line id="svg_375" y2="936" x2="2300" y1="936" x1="2000" class="sep"/>
+    <text id="svg_376" class="h" font-size="12.5" y="953" x="2009" style="white-space: pre;">magic: uint16_t</text>
+    <text id="svg_377" class="h" font-size="12.5" y="965" x="2009" style="white-space: pre;">count, next: uint8_t</text>
+    <text id="svg_378" class="h" font-size="12.5" y="977" x="2009" style="white-space: pre;">items[ERRBAR_COUNT]: ErrorBar</text>
+    <rect id="svg_379" height="90" width="300" y="992" x="2000" class="s"/>
+    <text id="svg_380" class="h" font-size="12" text-anchor="middle" y="1007" x="2150" style="white-space: pre;">«struct»</text>
+    <text id="svg_381" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1025" x="2150" style="white-space: pre;">DayAgg</text>
+    <line id="svg_382" y2="1034" x2="2300" y1="1034" x1="2000" class="sep"/>
+    <text id="svg_383" class="h" font-size="12.5" y="1051" x="2009" style="white-space: pre;">date: uint32_t</text>
+    <text id="svg_384" class="h" font-size="12.5" y="1063" x="2009" style="white-space: pre;">tmax, tmin: float; bestDiff: int</text>
+    <text id="svg_385" class="h" font-size="12.5" y="1075" x="2009" style="white-space: pre;">code: uint8_t</text>
+    <rect id="svg_386" height="170" width="250" y="1430" x="2050" class="s"/>
+    <text id="svg_387" class="h" font-size="12" text-anchor="middle" y="1445" x="2175" style="white-space: pre;">«class»</text>
+    <text id="svg_388" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1463" x="2175" style="white-space: pre;">WaitStream</text>
+    <line id="svg_389" y2="1472" x2="2300" y1="1472" x1="2050" class="sep"/>
+    <text id="svg_390" class="h" font-size="12.5" y="1489" x="2059" style="white-space: pre;">+c: Client&amp;</text>
+    <text id="svg_391" class="h" font-size="12.5" y="1505" x="2059" style="white-space: pre;">+tmo, count: uint32_t</text>
+    <text id="svg_392" class="h" font-size="12.5" y="1521" x="2059" style="white-space: pre;">+WaitStream(cl: Client&amp;, t: uint32_t)</text>
+    <text id="svg_393" class="h" font-size="12.5" y="1537" x="2059" style="white-space: pre;">+available(), peek(), read(): int</text>
+    <text id="svg_n_rb" class="h" font-size="12.5" y="1553" x="2059" style="white-space: pre;">+readBytes(b: char*, n: size_t): size_t</text>
+    <text id="svg_394" class="h" font-size="12.5" y="1569" x="2059" style="white-space: pre;">+write(uint8_t): size_t</text>
+    <text id="svg_395" class="h" font-size="12.5" y="1583" x="2059" style="white-space: pre;">«override»</text>
+    <rect id="svg_396" height="62" width="250" y="1650" x="2050" class="s"/>
+    <text id="svg_397" class="h" font-size="12" text-anchor="middle" y="1665" x="2175" style="white-space: pre;">«external»</text>
+    <text id="svg_398" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="1683" x="2175" style="white-space: pre;">Stream (Arduino API)</text>
+    <line id="svg_399" y2="1692" x2="2300" y1="1692" x1="2050" class="sep"/>
+    <text id="svg_400" class="h" font-size="12" y="1707" x="2059" style="white-space: pre;">Базовый класс библиотеки</text>
+    <path id="svg_401" d="m2175,1650l0,-50" marker-end="url(#tr)" class="l"/>
+  </g>
+</svg>

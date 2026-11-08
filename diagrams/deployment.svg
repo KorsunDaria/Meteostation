@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2020 1065" width="2020" height="1065">
+  <style>.t{font-family:Arial,Helvetica,sans-serif;fill:#000;paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}.h{font-family:Arial,Helvetica,sans-serif;fill:#000}.s{fill:#fff;stroke:#000;stroke-width:1.6}.l{stroke:#000;stroke-width:1.4;fill:none}.d{stroke:#000;stroke-width:1.4;fill:none;stroke-dasharray:7 5}</style>
+  <rect width="2020" height="1065" fill="#fff"/>
+  <rect x="8" y="8" width="2004" height="1049" fill="none" stroke="#000" stroke-width="1.5"/>
+  <text x="40" y="50" text-anchor="start" font-size="24" font-weight="bold" class="h" style="white-space: pre;">Метеостанция</text>
+  <text x="40" y="80" text-anchor="start" font-size="18" class="h" style="white-space: pre;">Диаграмма развертывания</text>
+  <line x1="40" y1="95" x2="1980" y2="95" stroke="#000"/>
+  <rect class="d" x="30" y="115" width="1260" height="920" fill="none"/>
+  <text x="50" y="146" text-anchor="start" font-size="17" font-weight="bold" class="h" style="white-space: pre;">Локальное оборудование</text>
+  <rect class="d" x="1370" y="115" width="620" height="920" fill="none"/>
+  <text x="1390" y="146" text-anchor="start" font-size="17" font-weight="bold" class="h" style="white-space: pre;">Внешняя инфраструктура</text>
+  <rect class="s" x="490" y="165" width="340" height="560"/>
+  <polygon class="s" points="490,165 506,149 846,149 830,165"/>
+  <polygon class="s" points="830,165 846,149 846,709 830,725"/>
+  <text x="660.0" y="193" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">«device»</text>
+  <text x="660.0" y="219" text-anchor="middle" font-size="18" font-weight="bold" class="t" style="white-space: pre;">Main ESP32-C6</text>
+  <rect class="s" x="530" y="410" width="260" height="70"/>
+  <text x="660.0" y="442.0" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">«artifact»</text>
+  <text x="660.0" y="465.0" text-anchor="middle" font-size="16" font-weight="bold" class="t" style="white-space: pre;">main_module.ino</text>
+  <rect class="s" x="50" y="185" width="240" height="62"/>
+  <polygon class="s" points="50,185 60,175 300,175 290,185"/>
+  <polygon class="s" points="290,185 300,175 300,237 290,247"/>
+  <text x="170.0" y="203" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«device»</text>
+  <text x="170.0" y="222" text-anchor="middle" font-size="15" font-weight="bold" class="t" style="white-space: pre;">SHT45</text>
+  <text x="170.0" y="239" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">T/RH; I²C GPIO18/19</text>
+  <line class="l" x1="300" y1="216" x2="490" y2="216"/>
+  <text x="395.0" y="208" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">I2C</text>
+  <rect class="s" x="50" y="261" width="240" height="62"/>
+  <polygon class="s" points="50,261 60,251 300,251 290,261"/>
+  <polygon class="s" points="290,261 300,251 300,313 290,323"/>
+  <text x="170.0" y="279" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«device»</text>
+  <text x="170.0" y="298" text-anchor="middle" font-size="15" font-weight="bold" class="t" style="white-space: pre;">BME280</text>
+  <text x="170.0" y="315" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">давление; I²C GPIO18/19</text>
+  <line class="l" x1="300" y1="292" x2="490" y2="292"/>
+  <text x="395.0" y="284" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">I2C</text>
+  <rect class="s" x="50" y="337" width="240" height="62"/>
+  <polygon class="s" points="50,337 60,327 300,327 290,337"/>
+  <polygon class="s" points="290,337 300,327 300,389 290,399"/>
+  <text x="170.0" y="355" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«device»</text>
+  <text x="170.0" y="374" text-anchor="middle" font-size="15" font-weight="bold" class="t" style="white-space: pre;">SCD40</text>
+  <text x="170.0" y="391" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">CO₂; I²C GPIO18/19</text>
+  <line class="l" x1="300" y1="368" x2="490" y2="368"/>
+  <text x="395.0" y="360" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">I2C</text>
+  <rect class="s" x="50" y="413" width="240" height="62"/>
+  <polygon class="s" points="50,413 60,403 300,403 290,413"/>
+  <polygon class="s" points="290,413 300,403 300,465 290,475"/>
+  <text x="170.0" y="431" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«device»</text>
+  <text x="170.0" y="450" text-anchor="middle" font-size="15" font-weight="bold" class="t" style="white-space: pre;">GPS NEO-6M</text>
+  <text x="170.0" y="467" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">UART GPIO22/23</text>
+  <line class="l" x1="300" y1="444" x2="490" y2="444"/>
+  <text x="395.0" y="436" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">UART</text>
+  <rect class="s" x="50" y="489" width="240" height="62"/>
+  <polygon class="s" points="50,489 60,479 300,479 290,489"/>
+  <polygon class="s" points="290,489 300,479 300,541 290,551"/>
+  <text x="170.0" y="507" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«device»</text>
+  <text x="170.0" y="526" text-anchor="middle" font-size="15" font-weight="bold" class="t" style="white-space: pre;">E-Ink Display</text>
+  <text x="170.0" y="543" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">SCK6 MOSI7 CS10 DC2 RST3 BUSY4</text>
+  <line class="l" x1="300" y1="520" x2="490" y2="520"/>
+  <text x="395.0" y="512" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">SPI (общая шина, свой CS)</text>
+  <rect class="s" x="50" y="565" width="240" height="62"/>
+  <polygon class="s" points="50,565 60,555 300,555 290,565"/>
+  <polygon class="s" points="290,565 300,555 300,617 290,627"/>
+  <text x="170.0" y="583" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«device»</text>
+  <text x="170.0" y="602" text-anchor="middle" font-size="15" font-weight="bold" class="t" style="white-space: pre;">microSD Module</text>
+  <text x="170.0" y="619" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">SPI; CS GPIO5, MISO GPIO20</text>
+  <line class="l" x1="300" y1="596" x2="490" y2="596"/>
+  <text x="395.0" y="588" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">SPI (общая шина, свой CS)</text>
+  <rect class="s" x="50" y="641" width="240" height="62"/>
+  <polygon class="s" points="50,641 60,631 300,631 290,641"/>
+  <polygon class="s" points="290,641 300,631 300,693 290,703"/>
+  <text x="170.0" y="659" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«device»</text>
+  <text x="170.0" y="678" text-anchor="middle" font-size="15" font-weight="bold" class="t" style="white-space: pre;">BOOT Button</text>
+  <text x="170.0" y="695" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">GPIO9</text>
+  <line class="l" x1="300" y1="672" x2="490" y2="672"/>
+  <text x="395.0" y="664" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">распаяна на плате</text>
+  <rect class="s" x="490" y="831" width="340" height="170"/>
+  <polygon class="s" points="490,831 506,815 846,815 830,831"/>
+  <polygon class="s" points="830,831 846,815 846,985 830,1001"/>
+  <text x="660.0" y="859" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">«device»</text>
+  <text x="660.0" y="885" text-anchor="middle" font-size="18" font-weight="bold" class="t" style="white-space: pre;">Outdoor ESP32-C6</text>
+  <rect class="s" x="530" y="910" width="260" height="70"/>
+  <text x="660.0" y="942.0" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">«artifact»</text>
+  <text x="660.0" y="965.0" text-anchor="middle" font-size="16" font-weight="bold" class="t" style="white-space: pre;">outdoor_module.ino</text>
+  <rect class="s" x="50" y="846" width="240" height="62"/>
+  <polygon class="s" points="50,846 60,836 300,836 290,846"/>
+  <polygon class="s" points="290,846 300,836 300,898 290,908"/>
+  <text x="170.0" y="864" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«device»</text>
+  <text x="170.0" y="883" text-anchor="middle" font-size="15" font-weight="bold" class="t" style="white-space: pre;">BME280</text>
+  <text x="170.0" y="900" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">T/RH/P; I²C GPIO18/19</text>
+  <line class="l" x1="300" y1="877" x2="490" y2="877"/>
+  <text x="395.0" y="869" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">I2C</text>
+  <rect class="s" x="50" y="922" width="240" height="62"/>
+  <polygon class="s" points="50,922 60,912 300,912 290,922"/>
+  <polygon class="s" points="290,922 300,912 300,974 290,984"/>
+  <text x="170.0" y="940" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«device»</text>
+  <text x="170.0" y="959" text-anchor="middle" font-size="15" font-weight="bold" class="t" style="white-space: pre;">BOOT Button</text>
+  <text x="170.0" y="976" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">GPIO9; сброс Zigbee-привязки</text>
+  <line class="l" x1="300" y1="953" x2="490" y2="953"/>
+  <text x="395.0" y="945" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">распаяна на плате</text>
+  <line class="d" x1="660.0" y1="725" x2="660.0" y2="815"/>
+  <text x="690.0" y="750" text-anchor="start" font-size="14" class="t" style="white-space: pre;">главный: Zigbee Coordinator</text>
+  <text x="690.0" y="778" text-anchor="start" font-size="14" font-weight="bold" class="t" style="white-space: pre;">Zigbee</text>
+  <text x="690.0" y="806" text-anchor="start" font-size="14" class="t" style="white-space: pre;">наружный: Zigbee End Device</text>
+  <rect class="s" x="1000" y="403" width="250" height="84"/>
+  <polygon class="s" points="1000,403 1014,389 1264,389 1250,403"/>
+  <polygon class="s" points="1250,403 1264,389 1264,473 1250,487"/>
+  <text x="1125.0" y="431" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">«device»</text>
+  <text x="1125.0" y="455" text-anchor="middle" font-size="15" font-weight="bold" class="t" style="white-space: pre;">Wi-Fi Router (STA)</text>
+  <text x="1125.0" y="475" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">домашняя сеть для синхронизации</text>
+  <line class="d" x1="846" y1="445" x2="1000" y2="445"/>
+  <text x="923.0" y="437" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">Wi-Fi STA</text>
+  <rect class="s" x="1410" y="232" width="140" height="526"/>
+  <polygon class="s" points="1410,232 1426,216 1566,216 1550,232"/>
+  <polygon class="s" points="1550,232 1566,216 1566,742 1550,758"/>
+  <text x="1480.0" y="262" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">«network»</text>
+  <text x="1480.0" y="288" text-anchor="middle" font-size="18" font-weight="bold" class="t" style="white-space: pre;">Internet</text>
+  <line class="l" x1="1264" y1="445" x2="1410" y2="445"/>
+  <text x="1337.0" y="437" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">WAN</text>
+  <rect class="s" x="1720" y="255" width="240" height="80"/>
+  <polygon class="s" points="1720,255 1730,245 1970,245 1960,255"/>
+  <polygon class="s" points="1960,255 1970,245 1970,325 1960,335"/>
+  <text x="1840" y="276" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«external service»</text>
+  <text x="1840" y="297" text-anchor="middle" font-size="15" font-weight="bold" class="t" style="white-space: pre;">MET Norway API</text>
+  <text x="1840" y="317" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">прогноз погоды</text>
+  <line class="d" x1="1566" y1="295" x2="1720" y2="295"/>
+  <text x="1643.0" y="287" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">HTTPS</text>
+  <rect class="s" x="1720" y="355" width="240" height="80"/>
+  <polygon class="s" points="1720,355 1730,345 1970,345 1960,355"/>
+  <polygon class="s" points="1960,355 1970,345 1970,425 1960,435"/>
+  <text x="1840" y="376" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«external service»</text>
+  <text x="1840" y="397" text-anchor="middle" font-size="15" font-weight="bold" class="t" style="white-space: pre;">Open-Meteo API</text>
+  <text x="1840" y="417" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">UV и качество воздуха</text>
+  <line class="d" x1="1566" y1="395" x2="1720" y2="395"/>
+  <text x="1643.0" y="387" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">HTTPS</text>
+  <rect class="s" x="1720" y="455" width="240" height="80"/>
+  <polygon class="s" points="1720,455 1730,445 1970,445 1960,455"/>
+  <polygon class="s" points="1960,455 1970,445 1970,525 1960,535"/>
+  <text x="1840" y="476" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«external service»</text>
+  <text x="1840" y="497" text-anchor="middle" font-size="15" font-weight="bold" class="t" style="white-space: pre;">OpenStreetMap Nominatim</text>
+  <text x="1840" y="517" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">название местоположения</text>
+  <line class="d" x1="1566" y1="495" x2="1720" y2="495"/>
+  <text x="1643.0" y="487" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">HTTPS</text>
+  <rect class="s" x="1720" y="555" width="240" height="80"/>
+  <polygon class="s" points="1720,555 1730,545 1970,545 1960,555"/>
+  <polygon class="s" points="1960,555 1970,545 1970,625 1960,635"/>
+  <text x="1840" y="576" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«external service»</text>
+  <text x="1840" y="597" text-anchor="middle" font-size="15" font-weight="bold" class="t" style="white-space: pre;">ip-api</text>
+  <text x="1840" y="617" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">резервное определение координат</text>
+  <line class="d" x1="1566" y1="595" x2="1720" y2="595"/>
+  <text x="1643.0" y="587" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">HTTP</text>
+  <rect class="s" x="1720" y="655" width="240" height="80"/>
+  <polygon class="s" points="1720,655 1730,645 1970,645 1960,655"/>
+  <polygon class="s" points="1960,655 1970,645 1970,725 1960,735"/>
+  <text x="1840" y="676" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«external service»</text>
+  <text x="1840" y="697" text-anchor="middle" font-size="15" class="t" font-weight="bold" style="white-space: pre;">NTP-серверы</text>
+  <text x="1840" y="717" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">pool.ntp.org, time.google.com</text>
+  <line class="d" x1="1566" y1="695" x2="1720" y2="695"/>
+  <text x="1643" y="687" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">UDP (NTP)</text>
+  <rect class="s" x="1000" y="558" width="250" height="84"/>
+  <polygon class="s" points="1000,558 1014,544 1264,544 1250,558"/>
+  <polygon class="s" points="1250,558 1264,544 1264,628 1250,642"/>
+  <text x="1125" y="586" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">«device»</text>
+  <text x="1125" y="610" text-anchor="middle" font-size="15" class="t" font-weight="bold" style="white-space: pre;">Устройство пользователя</text>
+  <text x="1125" y="630" text-anchor="middle" font-size="13" class="t" style="white-space: pre;">веб-браузер, портал настройки</text>
+  <line class="d" x1="846" y1="600" x2="1000" y2="600"/>
+  <text x="923" y="584" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">Wi-Fi SoftAP</text>
+  <text x="923" y="620" text-anchor="middle" font-size="14" class="t" style="white-space: pre;">HTTP :80</text>
+</svg>

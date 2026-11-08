@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2540" height="1340">
+  <style>.t{font-family:Arial,Helvetica,sans-serif;fill:#000;paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}.h{font-family:Arial,Helvetica,sans-serif;fill:#000}.s{fill:#fff;stroke:#000;stroke-width:1.6}.l{stroke:#000;stroke-width:1.4;fill:none}.d{stroke:#000;stroke-width:1.4;fill:none;stroke-dasharray:7 5}</style>
+  <defs>
+    <marker markerUnits="userSpaceOnUse" orient="auto" refY="6" refX="11" markerHeight="12" markerWidth="12" id="o">
+      <path id="svg_1" stroke-width="1.5" stroke="#000" fill="none" d="m1,1l10,5l-10,5"/>
+    </marker>
+  </defs>
+  <g>
+    <title>background</title>
+    <rect fill="none" id="canvas_background" height="602" width="802" y="-1" x="-1"/>
+  </g>
+  <g>
+    <title>Layer 1</title>
+    <rect id="svg_2" fill="#fff" height="1340" width="2540"/>
+    <rect id="svg_3" stroke-width="1.5" stroke="#000" fill="none" height="1324" width="2524" y="8" x="9"/>
+    <text id="svg_4" class="h" font-weight="bold" font-size="24" text-anchor="start" y="50" x="40" style="white-space: pre;">Метеостанция</text>
+    <text id="svg_5" class="h" font-size="18" text-anchor="start" y="80" x="40" style="white-space: pre;">Диаграмма компонентов </text>
+    <line id="svg_6" stroke="#000" y2="95" x2="2500" y1="95" x1="40"/>
+    <rect id="svg_7" stroke-width="2.2" height="920" width="1375" y="205" x="335" class="s"/>
+    <text id="svg_8" class="t" font-weight="bold" font-size="15" text-anchor="start" y="232" x="350" style="white-space: pre;">«subsystem»  Main module — ESP32-C6</text>
+    <rect id="svg_9" height="835" width="1285" y="250" x="380" class="s"/>
+    <text id="svg_13" class="t" font-weight="bold" font-size="15" text-anchor="start" y="277" x="395" style="white-space: pre;">Main Module Control</text>
+    <text id="svg_14" class="t" font-size="11" text-anchor="start" y="293" x="395" style="white-space: pre;">(MainModuleController)</text>
+    <rect id="svg_15" stroke-width="2.2" height="510" width="560" y="405" x="1940" class="s"/>
+    <text id="svg_16" class="t" font-weight="bold" font-size="15" text-anchor="start" y="430" x="1955" style="white-space: pre;">«subsystem»  Outdoor module — ESP32-C6</text>
+    <rect id="svg_17" height="425" width="510" y="455" x="1965" class="s"/>
+    <text id="svg_21" class="t" font-weight="bold" font-size="14" text-anchor="start" y="478" x="1980" style="white-space: pre;">Outdoor Module Control</text>
+    <text id="svg_22" class="t" font-size="11" text-anchor="start" y="494" x="1980" style="white-space: pre;">(OutdoorModuleController)</text>
+    <rect id="svg_23" height="100" width="280" y="310" x="420" class="s"/>
+    <text id="svg_27" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="344" x="560" style="white-space: pre;">Forecast and External Data</text>
+    <text id="svg_28" class="h" font-size="11" text-anchor="middle" y="368" x="560" style="white-space: pre;">ForecastServiceGateway,</text>
+    <text id="svg_29" class="h" font-size="11" text-anchor="middle" y="384" x="560" style="white-space: pre;">ExternalForecastController (глобальный объект)</text>
+    <rect id="svg_30" height="100" width="280" y="310" x="1360" class="s"/>
+    <text id="svg_34" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="344" x="1500" style="white-space: pre;">Settings and User Interaction</text>
+    <text id="svg_35" class="h" font-size="11" text-anchor="middle" y="368" x="1500" style="white-space: pre;">SettingsController, ConfigPortal,</text>
+    <text id="svg_36" class="h" font-size="11" text-anchor="middle" y="384" x="1500" style="white-space: pre;">ButtonController, ResetForm,</text>
+    <text id="svg_new_mr" class="h" font-size="11" text-anchor="middle" y="400.0" x="1500" style="white-space: pre;">MeasurementRequest · SoftAP config</text>
+    <rect id="svg_37" height="100" width="280" y="530" x="420" class="s"/>
+    <text id="svg_41" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="564" x="560" style="white-space: pre;">Network Management</text>
+    <text id="svg_42" class="h" font-size="11" text-anchor="middle" y="588" x="560" style="white-space: pre;">WiFiGateway, UpdateScheduler,</text>
+    <text id="svg_43" class="h" font-size="11" text-anchor="middle" y="604" x="560" style="white-space: pre;">ConnectionController</text>
+    <text class="h" font-size="10.5" text-anchor="middle" y="622" x="560" style="white-space: pre;">STA sync</text>
+    <rect id="svg_44" height="100" width="280" y="570" x="890" class="s"/>
+    <text id="svg_48" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="604" x="1030" style="white-space: pre;">Display Management</text>
+    <text id="svg_49" class="h" font-size="11" text-anchor="middle" y="628" x="1030" style="white-space: pre;">DisplayController,</text>
+    <text id="svg_50" class="h" font-size="11" text-anchor="middle" y="644" x="1030" style="white-space: pre;">EInkDisplayGateway</text>
+    <rect id="svg_51" height="100" width="280" y="520" x="1360" class="s"/>
+    <text id="svg_55" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="554" x="1500" style="white-space: pre;">Zigbee Communication</text>
+    <text id="svg_56" class="h" font-size="11" text-anchor="middle" y="578" x="1500" style="white-space: pre;">MyZigbeeGateway</text>
+    <rect id="svg_58" height="100" width="280" y="740" x="1360" class="s"/>
+    <text id="svg_62" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="774" x="1500" style="white-space: pre;">Storage Management</text>
+    <text id="svg_63" class="h" font-size="11" text-anchor="middle" y="798" x="1500" style="white-space: pre;">StorageManager, HistoryManager,</text>
+    <text id="svg_64" class="h" font-size="11" text-anchor="middle" y="814" x="1500" style="white-space: pre;">SDCardController (глобальный объект)</text>
+    <rect id="svg_65" height="100" width="280" y="750" x="420" class="s"/>
+    <text id="svg_69" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="784" x="560" style="white-space: pre;">Time Management</text>
+    <text id="svg_70" class="h" font-size="11" text-anchor="middle" y="808" x="560" style="white-space: pre;">TimeManager</text>
+    <rect id="svg_71" height="100" width="280" y="940" x="890" class="s"/>
+    <text id="svg_75" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="974" x="1030" style="white-space: pre;">Measurement Management</text>
+    <text id="svg_76" class="h" font-size="11" text-anchor="middle" y="998" x="1030" style="white-space: pre;">MeasurementController,</text>
+    <text id="svg_77" class="h" font-size="11" text-anchor="middle" y="1014" x="1030" style="white-space: pre;">IndoorSensorsGateway, GPSGateway</text>
+    <rect id="svg_78" height="100" width="300" y="520" x="2070" class="s"/>
+    <text id="svg_82" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="554" x="2220" style="white-space: pre;">Zigbee Communication</text>
+    <text id="svg_83" class="h" font-size="11" text-anchor="middle" y="578" x="2220" style="white-space: pre;">MyZigbeeGateway</text>
+    <text id="svg_84" class="h" font-size="11" text-anchor="middle" y="594" x="2220" style="white-space: pre;">(конечное устройство)</text>
+    <rect id="svg_85" height="100" width="220" y="730" x="1990" class="s"/>
+    <text id="svg_89" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="764" x="2100" style="white-space: pre;">Outdoor Measurement</text>
+    <text id="svg_90" class="h" font-size="11" text-anchor="middle" y="788" x="2100" style="white-space: pre;">OutdoorModuleController,</text>
+    <text id="svg_91" class="h" font-size="11" text-anchor="middle" y="804" x="2100" style="white-space: pre;">OutdoorReading (BME280: <tspan x="2100" dy="1em">​</tspan>T/RH/P локально)</text>
+    <rect id="svg_92" height="100" width="220" y="730" x="2230" class="s"/>
+    <text id="svg_96" class="h" font-weight="bold" font-size="14" text-anchor="middle" y="764" x="2340" style="white-space: pre;">Binding Reset</text>
+    <text id="svg_97" class="h" font-size="11" text-anchor="middle" y="788" x="2340" style="white-space: pre;">BindingResetController</text>
+    <text id="svg_98" class="h" font-size="11" text-anchor="middle" y="804" x="2340" style="white-space: pre;">(BOOT 3 с)</text>
+    <rect id="svg_99" height="150" width="210" y="440" x="40" class="s"/>
+    <text id="svg_100" class="h" font-size="11" text-anchor="middle" y="457" x="145" style="white-space: pre;">«external»</text>
+    <text id="svg_101" class="h" font-weight="bold" font-size="13" text-anchor="middle" y="475" x="145" style="white-space: pre;">Сервисы данных</text>
+    <text id="svg_102" class="h" font-size="11" text-anchor="middle" y="491" x="145" style="white-space: pre;">MET Norway Locationforecast</text>
+    <text id="svg_103" class="h" font-size="11" text-anchor="middle" y="506" x="145" style="white-space: pre;">Open-Meteo (AQI, UV)</text>
+    <text id="svg_104" class="h" font-size="11" text-anchor="middle" y="521" x="145" style="white-space: pre;">OpenStreetMap Nominatim</text>
+    <text id="svg_105" class="h" font-size="11" text-anchor="middle" y="536" x="145" style="white-space: pre;">ip-api.com (позиция по IP)</text>
+    <rect id="svg_106" height="100" width="210" y="600" x="40" class="s"/>
+    <text id="svg_107" class="h" font-size="11" text-anchor="middle" y="617" x="145" style="white-space: pre;">«external»</text>
+    <text id="svg_108" class="h" font-weight="bold" font-size="13" text-anchor="middle" y="635" x="145" style="white-space: pre;">NTP-серверы</text>
+    <text id="svg_109" class="h" font-size="11" text-anchor="middle" y="651" x="145" style="white-space: pre;">pool.ntp.org</text>
+    <text id="svg_110" class="h" font-size="11" text-anchor="middle" y="666" x="145" style="white-space: pre;">time.google.com</text>
+    <rect id="svg_111" height="58" width="240" y="112" x="910" class="s"/>
+    <text id="svg_112" class="h" font-size="11" text-anchor="middle" y="129" x="1030" style="white-space: pre;">«device»</text>
+    <text id="svg_113" class="h" font-weight="bold" font-size="13" text-anchor="middle" y="147" x="1030" style="white-space: pre;">E-Ink дисплей</text>
+    <text id="svg_114" class="h" font-size="11" text-anchor="middle" y="162" x="1030" style="white-space: pre;">GDEY075T7, 7.5″, 800×480</text>
+    <rect id="svg_115" height="62" width="180" y="765" x="1735" class="s"/>
+    <text id="svg_116" class="h" font-size="11" text-anchor="middle" y="782" x="1825" style="white-space: pre;">«device»</text>
+    <text id="svg_117" class="h" font-weight="bold" font-size="13" text-anchor="middle" y="800" x="1825" style="white-space: pre;">microSD</text>
+    <text id="svg_118" class="h" font-size="11" text-anchor="middle" y="816" x="1825" style="white-space: pre;">CSV-архив, резерв прогноза</text>
+    <rect id="svg_119" height="56" width="190" y="235" x="1735" class="s"/>
+    <text id="svg_120" class="h" font-size="11" text-anchor="middle" y="252" x="1830" style="white-space: pre;">«device»</text>
+    <text id="svg_121" class="h" font-weight="bold" font-size="13" text-anchor="middle" y="270" x="1830" style="white-space: pre;">Кнопка BOOT (GPIO9)</text>
+    <rect id="svg_122" height="70" width="190" y="335" x="1735" class="s"/>
+    <text id="svg_123" class="h" font-size="11" text-anchor="middle" y="352" x="1830" style="white-space: pre;">«actor»</text>
+    <text id="svg_124" class="h" font-weight="bold" font-size="13" text-anchor="middle" y="370" x="1830" style="white-space: pre;">Веб-браузер</text>
+    <text id="svg_125" class="h" font-size="11" text-anchor="middle" y="386" x="1830" style="white-space: pre;">HTTP :80 </text>
+    <rect id="svg_126" height="62" width="180" y="1210" x="610" class="s"/>
+    <text id="svg_127" class="h" font-size="11" text-anchor="middle" y="1227" x="700" style="white-space: pre;">«device»</text>
+    <text id="svg_128" class="h" font-weight="bold" font-size="13" text-anchor="middle" y="1245" x="700" style="white-space: pre;">GPS NEO-6M</text>
+    <text id="svg_129" class="h" font-size="11" text-anchor="middle" y="1261" x="700" style="white-space: pre;">UART</text>
+    <rect id="svg_130" height="62" width="180" y="1210" x="870" class="s"/>
+    <text id="svg_131" class="h" font-size="11" text-anchor="middle" y="1227" x="960" style="white-space: pre;">«device»</text>
+    <text id="svg_132" class="h" font-weight="bold" font-size="13" text-anchor="middle" y="1245" x="960" style="white-space: pre;">SHT45</text>
+    <text id="svg_133" class="h" font-size="11" text-anchor="middle" y="1261" x="960" style="white-space: pre;">T, RH</text>
+    <rect id="svg_134" height="62" width="180" y="1210" x="1070" class="s"/>
+    <text id="svg_135" class="h" font-size="11" text-anchor="middle" y="1227" x="1160" style="white-space: pre;">«device»</text>
+    <text id="svg_136" class="h" font-weight="bold" font-size="13" text-anchor="middle" y="1245" x="1160" style="white-space: pre;">BME280</text>
+    <text id="svg_137" class="h" font-size="11" text-anchor="middle" y="1261" x="1160" style="white-space: pre;">давление</text>
+    <rect id="svg_138" height="62" width="180" y="1210" x="1270" class="s"/>
+    <text id="svg_139" class="h" font-size="11" text-anchor="middle" y="1227" x="1360" style="white-space: pre;">«device»</text>
+    <text id="svg_140" class="h" font-weight="bold" font-size="13" text-anchor="middle" y="1245" x="1360" style="white-space: pre;">SCD40</text>
+    <text id="svg_141" class="h" font-size="11" text-anchor="middle" y="1261" x="1360" style="white-space: pre;">CO₂</text>
+    <rect id="svg_142" height="62" width="200" y="990" x="2000" class="s"/>
+    <text id="svg_143" class="h" font-size="11" text-anchor="middle" y="1007" x="2100" style="white-space: pre;">«device»</text>
+    <text id="svg_144" class="h" font-weight="bold" font-size="13" text-anchor="middle" y="1025" x="2100" style="white-space: pre;">BME280</text>
+    <text id="svg_145" class="h" font-size="11" text-anchor="middle" y="1041" x="2100" style="white-space: pre;">T, RH, давление</text>
+    <rect id="svg_146" height="62" width="200" y="990" x="2240" class="s"/>
+    <text id="svg_147" class="h" font-size="11" text-anchor="middle" y="1007" x="2340" style="white-space: pre;">«device»</text>
+    <text id="svg_148" class="h" font-weight="bold" font-size="13" text-anchor="middle" y="1025" x="2340" style="white-space: pre;">Кнопка BOOT (GPIO9)</text>
+    <line id="svg_149" marker-end="url(#o)" y2="410" x2="680" y1="580" x1="890" class="d"/>
+    <line id="svg_150" marker-end="url(#o)" y2="590" x2="700" y1="610" x1="890" class="d"/>
+    <line id="svg_151" marker-end="url(#o)" y2="750" x2="680" y1="660" x1="890" class="d"/>
+    <line id="svg_152" marker-end="url(#o)" y2="940" x2="1030" y1="670" x1="1030" class="d"/>
+    <line id="svg_153" marker-end="url(#o)" y2="775" x2="1360" y1="650" x1="1170" class="d"/>
+    <line id="svg_154" marker-end="url(#o)" y2="575" x2="1360" y1="595" x1="1170" class="d"/>
+    <line id="svg_155" marker-end="url(#o)" y2="385" x2="1360" y1="570" x1="1140" class="d"/>
+    <line id="svg_156" marker-end="url(#o)" y2="410" x2="560" y1="530" x1="560" class="d"/>
+    <line id="svg_157" marker-end="url(#o)" y2="630" x2="560" y1="750" x1="560" class="d"/>
+    <line id="svg_158" marker-end="url(#o)" y2="980" x2="890" y1="850" x1="650" class="d"/>
+    <line id="svg_159" marker-end="url(#o)" y2="980" x2="1170" y1="840" x1="1390" class="d"/>
+    <line id="svg_160" marker-end="url(#o)" y2="620" x2="1500" y1="740" x1="1500" class="d"/>
+    <line id="svg_161" marker-end="url(#o)" y2="520" x2="1500" y1="410" x1="1500" class="d"/>
+    <path id="svg_162" marker-end="url(#o)" class="d" d="M420,375H145V440"/>
+    <line id="svg_163" marker-end="url(#o)" y2="615" x2="250" y1="615" x1="420" class="d"/>
+    <path d="M700,330H1360" class="d" marker-end="url(#o)"/>
+    <path d="M640,530V510H1440V410" class="d" marker-end="url(#o)"/>
+    <path d="M700,810H1325V358H1360" class="d" marker-end="url(#o)"/>
+    <path d="M1390,520V410" class="d" marker-end="url(#o)"/>
+    <line id="svg_164" y2="170" x2="1030" y1="570" x1="1030" class="l"/>
+    <line id="svg_165" y2="796" x2="1735" y1="790" x1="1640" class="l"/>
+    <line id="svg_166" y2="263" x2="1735" y1="335" x1="1640" class="l"/>
+    <line id="svg_167" y2="372" x2="1735" y1="385" x1="1640" class="l"/>
+    <path id="svg_168" d="m910,1040l0,125l-210,0l0,45" class="l"/>
+    <path id="svg_169" d="m1030,1040l0,125m-70,0l400,0m-400,0l0,45m200,-45l0,45m200,-45l0,45" class="l"/>
+    <line id="svg_170" marker-end="url(#o)" y2="620" x2="2140" y1="730" x1="2170" class="d"/>
+    <line id="svg_171" marker-end="url(#o)" y2="620" x2="2300" y1="730" x1="2270" class="d"/>
+    <line id="svg_172" y2="990" x2="2100" y1="830" x1="2100" class="l"/>
+    <line id="svg_173" y2="990" x2="2340" y1="830" x1="2340" class="l"/>
+    <line id="svg_174" y2="570" x2="2037" y1="570" x1="1640" class="l"/>
+    <path id="svg_175" d="m2048,559a11,11 0 0 0 0,22" class="l"/>
+    <circle id="svg_176" r="6" cy="570" cx="2048" class="s"/>
+    <line id="svg_177" y2="570" x2="2070" y1="570" x1="2054" class="l"/>
+    <rect id="svg_178" height="12" width="12" y="199" x="1024" class="s"/>
+    <rect id="svg_179" height="12" width="12" y="369" x="329" class="s"/>
+    <rect id="svg_180" height="12" width="12" y="609" x="329" class="s"/>
+    <rect id="svg_181" height="12" width="12" y="564" x="1704" class="s"/>
+    <rect id="svg_182" height="12" width="12" y="787" x="1704" class="s"/>
+    <rect id="svg_183" height="12" width="12" y="276" x="1704" class="s"/>
+    <rect id="svg_184" height="12" width="12" y="370" x="1704" class="s"/>
+    <rect id="svg_185" height="12" width="12" y="1119" x="904" class="s"/>
+    <rect id="svg_186" height="12" width="12" y="1119" x="1024" class="s"/>
+    <rect id="svg_187" height="12" width="12" y="564" x="1934" class="s"/>
+    <rect id="svg_188" height="12" width="12" y="909" x="2094" class="s"/>
+    <rect id="svg_189" height="12" width="12" y="909" x="2334" class="s"/>
+    <text id="svg_190" class="t" font-size="12" text-anchor="start" y="478" x="800" style="white-space: pre;">«Прогноз, AQI, UV»</text>
+    <text id="svg_191" class="t" font-size="12" text-anchor="middle" y="627.96" x="802.865" style="white-space: pre; font-size: 12px;">«Состояние Wi-Fi»</text>
+    <text id="svg_192" class="t" font-size="12" text-anchor="start" y="728" x="790" style="white-space: pre;">«Время»</text>
+    <text id="svg_193" class="t" font-size="12" text-anchor="start" y="475" x="572" style="white-space: pre;">«Запрос прогноза»</text>
+    <text id="svg_194" class="t" font-size="12" text-anchor="start" y="695" x="572" style="white-space: pre;">«NTP-время»</text>
+    <text id="svg_195" class="t" font-size="12" text-anchor="start" y="923.072" x="591.483" style="white-space: pre; font-size: 12px;">«GPS: время, координаты»</text>
+    <text id="svg_196" class="t" font-size="12" text-anchor="start" y="850" x="1042" style="white-space: pre;">«Измерения: T, RH, p, CO₂, GPS»</text>
+    <text id="svg_197" class="t" font-size="12" text-anchor="start" y="925" x="1300" style="white-space: pre;">«Измерения»</text>
+    <text id="svg_198" class="t" font-size="12" text-anchor="start" y="735" x="1215" style="white-space: pre;">«История»</text>
+    <text id="svg_199" class="t" font-size="12" text-anchor="middle" y="566" x="1265" style="white-space: pre;">«Наружные T, RH»</text>
+    <text id="svg_200" class="t" font-size="12" text-anchor="start" y="685" x="1512" style="white-space: pre;">«Наружные T, RH <tspan x="1512" dy="1em">​</tspan>(без давления)»</text>
+    <text id="svg_201" class="t" font-size="12" text-anchor="end" y="462" x="1230" style="white-space: pre;">«Параметры отображения»</text>
+    <text id="svg_202" class="t" font-size="12" text-anchor="start" y="470" x="1512" style="white-space: pre;">«Открыть сеть»</text>
+    <text id="svg_203" class="t" font-size="12" text-anchor="middle" y="367" x="292" style="white-space: pre;">HTTPS / HTTP (Wi-Fi STA)</text>
+    <text id="svg_204" class="t" font-size="12" text-anchor="middle" y="607" x="292" style="white-space: pre;">Wi-Fi STA, NTP</text>
+    <text id="svg_205" class="t" font-size="12" text-anchor="start" y="195" x="1042" style="white-space: pre;">SPI</text>
+    <text id="svg_206" class="t" font-size="12" text-anchor="middle" y="826" x="1722" style="white-space: pre;">SPI</text>
+    <text id="svg_207" class="t" font-size="12" text-anchor="middle" y="252" x="1722" style="white-space: pre;">GPIO</text>
+    <text id="svg_208" class="t" font-size="12" text-anchor="middle" y="410" x="1722" style="white-space: pre;">Wi-Fi SoftAP</text>
+    <text id="svg_209" class="t" font-size="12" text-anchor="middle" y="1155" x="805" style="white-space: pre;">UART (GPIO22/23)</text>
+    <text id="svg_210" class="t" font-size="12" text-anchor="start" y="1150" x="1042" style="white-space: pre;">I²C (GPIO18/19)</text>
+    <text id="svg_211" class="t" font-weight="bold" font-size="13" text-anchor="middle" y="548" x="1825" style="white-space: pre;">Zigbee</text>
+    <text id="svg_214" class="t" font-size="12" text-anchor="end" y="685" x="2132" style="white-space: pre;">«Публикация T, RH»</text>
+    <text id="svg_215" class="t" font-size="12" text-anchor="start" y="685" x="2292" style="white-space: pre;">«Сброс привязки»</text>
+    <text x="850" y="322" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«Часовой пояс (Settings → Time)»</text>
+    <text x="1262" y="502" text-anchor="start" font-size="12" class="t" style="white-space: pre;">«Wi-Fi: SSID, пароль»</text>
+    <text x="880" y="802" text-anchor="middle" font-size="12" class="t" style="white-space: pre;">«Часовой пояс, ночь»</text>
+    <text x="1382" y="455" text-anchor="end" font-size="12" class="t" style="white-space: pre;">«Тайм-аут связи»</text>
+    <text id="svg_216" class="t" font-size="12" text-anchor="start" y="960" x="2112" style="white-space: pre;">I²C (GPIO18/19)</text>
+    <text id="svg_217" class="t" font-size="12" text-anchor="start" y="960" x="2352" style="white-space: pre;">GPIO9</text>
+    <text id="svg_218" class="t" font-size="12" text-anchor="middle" y="520" x="1930" style="white-space: pre;">T, RH →</text>
+    <path id="flow_set_meas" class="d" marker-end="url(#o)" d="M1640,360H1655V1022H1170"/>
+    <text class="t" font-size="12" text-anchor="middle" x="1412" y="1014" style="white-space: pre;">«Запрос измерения»</text>
+    <path id="flow_net_stor" class="d" marker-end="url(#o)" d="M700,620H745V880H1450V840"/>
+    <text class="t" font-size="12" text-anchor="middle" x="1150" y="874" style="white-space: pre;">«Резерв прогноза»</text>
+    <path id="flow_stor_time" class="d" marker-end="url(#o)" d="M1400,840V905H590V850"/>
+    <text class="t" font-size="12" text-anchor="middle" x="880" y="899" style="white-space: pre;">«Время при старте»</text>
+    <path id="flow_zb_meas" class="d" marker-end="url(#o)" d="M1360,600H1250V1000H1170"/>
+    <text class="t" font-size="12" text-anchor="start" x="1256" y="640" style="white-space: pre;">«Наружная T для тренда»</text>
+  </g>
+</svg>
